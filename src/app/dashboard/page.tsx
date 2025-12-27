@@ -1,39 +1,79 @@
-import { Card, CardContent } from "@/components/ui/card";
+"use client";
+
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { SimpleChart } from "@/components/dashboard/SimpleChart";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { dashboardStats } from "@/lib/dashboard-data";
+import { Calendar, DollarSign, ShoppingBag, Zap } from "lucide-react";
 
 export default function DashboardPage() {
+  const categoryData = [
+    { label: "AI Subscriptions", value: 2 },
+    { label: "Software Licenses", value: 2 },
+    { label: "Creative Tools", value: 2 },
+    { label: "Courses", value: 2 },
+  ];
+
+  const statusData = [
+    { label: "Active", value: 6 },
+    { label: "Expired", value: 2 },
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-semibold mb-8">ড্যাশবোর্ড</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">মোট অর্ডার</h3>
-            <p className="text-3xl font-bold">0</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">মোট বিক্রয়</h3>
-            <p className="text-3xl font-bold">৳0</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">কার্টে আইটেম</h3>
-            <p className="text-3xl font-bold">0</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">উইশলিস্ট</h3>
-            <p className="text-3xl font-bold">0</p>
-          </CardContent>
-        </Card>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold mb-2">Dashboard Overview</h1>
+        <p className="text-muted-foreground">
+          Welcome back! Here's your account summary.
+        </p>
       </div>
-      <div className="text-center py-16">
-        <p className="text-muted-foreground">ড্যাশবোর্ড সামগ্রী শীঘ্রই আসছে...</p>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          title="Active Subscriptions"
+          value={dashboardStats.totalActiveSubscriptions}
+          icon={Zap}
+          trend={{ value: "+2 this month", isPositive: true }}
+        />
+        <StatCard
+          title="Total Purchases"
+          value={dashboardStats.totalPurchases}
+          icon={ShoppingBag}
+        />
+        <StatCard
+          title="Upcoming Expiry"
+          value={dashboardStats.upcomingExpiry}
+          icon={Calendar}
+          trend={{ value: "Next 30 days", isPositive: false }}
+        />
+        <StatCard
+          title="Monthly Spend"
+          value={`৳${dashboardStats.monthlySpend.toLocaleString()}`}
+          icon={DollarSign}
+        />
       </div>
+
+      {/* Charts and Activities */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <SimpleChart
+            title="Category-wise Purchases"
+            data={categoryData}
+            type="bar"
+          />
+        </div>
+        <div>
+          <SimpleChart
+            title="Subscription Status"
+            data={statusData}
+            type="pie"
+          />
+        </div>
+      </div>
+
+      {/* Activity Feed */}
+      <ActivityFeed activities={dashboardStats.recentActivities} />
     </div>
   );
 }
-

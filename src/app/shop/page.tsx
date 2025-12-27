@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import RecentOrders from "@/components/home/RecentOrders";
 
 export default function ShopPage() {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
@@ -200,6 +201,9 @@ export default function ShopPage() {
       {/* Featured Products Slider */}
       <div className="bg-muted/30 py-8">
         <FeaturedProductsSlider />
+      </div>
+      <div className="bg-muted/30 py-8">
+        <RecentOrders />
       </div>
     </div>
   );
