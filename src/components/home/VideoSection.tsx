@@ -6,8 +6,8 @@ export default function VideoSection() {
   return (
     <section className="">
       <div className="container mx-auto px-4 py-12 ">
-        <div className="grid md:grid-cols-2 gap-8 items-center border-2 border-primary/20 rounded-xl pl-6">
-          <div className="space-y-6">
+        <div className="grid md:grid-cols-2 gap-8 items-center border-2 border-primary/20 rounded-xl md:pl-6">
+          <div className="space-y-6 p-5 md:p-0">
             <h2 className="text-3xl font-semibold">
               কেন Softynix-এ বিশ্বাস করবেন?
             </h2>
