@@ -14,7 +14,23 @@ interface SimpleChartProps {
   type?: "bar" | "pie";
 }
 
-export function SimpleChart({ title, data, type = "bar" }: SimpleChartProps) {
+export function SimpleChart({ title, data = [], type = "bar" }: SimpleChartProps) {
+  // Handle empty or undefined data
+  if (!data || data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center py-8">
+            No data available
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const maxValue = Math.max(...data.map((d) => d.value));
 
   if (type === "pie") {

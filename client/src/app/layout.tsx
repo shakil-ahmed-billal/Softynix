@@ -5,6 +5,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./providers/theme-provider";
 import { QueryProvider } from "./providers/query-provider";
+import { ToastProvider } from "./providers/toast-provider";
+import { AuthProvider } from "@/contexts/auth-context";
 import { CartWrapper } from "@/components/cart/CartWrapper";
 
 const inter = Inter({
@@ -33,13 +35,16 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <CartWrapper>
-              <div className="flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </div>
-            </CartWrapper>
+            <AuthProvider>
+              <ToastProvider />
+              <CartWrapper>
+                <div className="flex min-h-screen flex-col">
+                  <Header />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                </div>
+              </CartWrapper>
+            </AuthProvider>
           </ThemeProvider>
         </QueryProvider>
       </body>

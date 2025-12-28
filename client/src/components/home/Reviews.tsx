@@ -1,7 +1,33 @@
+"use client";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { reviews } from "@/lib/dummy-data";
 import { Quote, Star } from "lucide-react";
+
+// Static reviews - can be replaced with API later
+const reviews = [
+  {
+    id: 1,
+    name: "John Doe",
+    profession: "Software Developer",
+    rating: 5,
+    comment: "Excellent service and fast delivery. Highly recommended!",
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    profession: "Designer",
+    rating: 5,
+    comment: "Great quality products and amazing customer support.",
+  },
+  {
+    id: 3,
+    name: "Mike Johnson",
+    profession: "Entrepreneur",
+    rating: 4,
+    comment: "Good platform for digital products. Will order again!",
+  },
+];
 
 export default function Reviews() {
   return (

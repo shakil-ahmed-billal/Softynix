@@ -1,11 +1,11 @@
 "use client";
 
-import { useCart } from "@/contexts/cart-context";
 import { CartItemCard } from "@/components/cart/CartItemCard";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { categories } from "@/lib/dummy-data";
-import { ShoppingCart, ArrowRight, Trash2 } from "lucide-react";
+import { useCart } from "@/contexts/cart-context";
+import { useActiveCategories } from "@/hooks/useCategories";
+import { ArrowRight, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -19,11 +19,12 @@ export default function CartPage() {
     clearCart,
   } = useCart();
   const router = useRouter();
+  const { data: categories } = useActiveCategories();
 
   // Group cart items by category
   const groupedItems = cartItems.reduce((acc, item) => {
-    const category = categories.find((cat) => cat.id === item.categoryId);
-    const categoryName = category?.nameBn || "অন্যান্য";
+    const category = categories?.find((cat) => cat.id === item.categoryId);
+    const categoryName = category?.name || "Other";
     if (!acc[categoryName]) {
       acc[categoryName] = [];
     }
@@ -32,8 +33,8 @@ export default function CartPage() {
   }, {} as Record<string, typeof cartItems>);
 
   const handleBuyNow = () => {
-    // Navigate to checkout - you can update this path when checkout page is created
-    router.push("/cart");
+    // Navigate to checkout page
+    router.push("/checkout");
   };
 
   if (cartItems.length === 0) {
@@ -137,11 +138,7 @@ export default function CartPage() {
 
               {/* Action Buttons */}
               <div className="space-y-3 pt-4">
-                <Button
-                  size="lg"
-                  className="w-full"
-                  onClick={handleBuyNow}
-                >
+                <Button size="lg" className="w-full" onClick={handleBuyNow}>
                   এখনই কিনুন
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

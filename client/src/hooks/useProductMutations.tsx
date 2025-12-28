@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useAxiosPublic from "./useAxiosPublic";
+import useAxiosAdmin from "./useAxiosAdmin";
 
 interface CreateProductData {
   name: string;
@@ -27,12 +27,12 @@ interface ApiResponse<T> {
 }
 
 export const useCreateProduct = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosAdmin = useAxiosAdmin();
   const queryClient = useQueryClient();
 
   return useMutation<ApiResponse<any>, Error, CreateProductData>({
     mutationFn: async (data) => {
-      const response = await axiosPublic.post<ApiResponse<any>>("/api/products", data);
+      const response = await axiosAdmin.post<ApiResponse<any>>("/api/products", data);
       return response.data;
     },
     onSuccess: () => {
@@ -42,13 +42,13 @@ export const useCreateProduct = () => {
 };
 
 export const useUpdateProduct = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosAdmin = useAxiosAdmin();
   const queryClient = useQueryClient();
 
   return useMutation<ApiResponse<any>, Error, UpdateProductData>({
     mutationFn: async (data) => {
       const { id, ...updateData } = data;
-      const response = await axiosPublic.put<ApiResponse<any>>(
+      const response = await axiosAdmin.put<ApiResponse<any>>(
         `/api/products/${id}`,
         updateData
       );
@@ -62,12 +62,12 @@ export const useUpdateProduct = () => {
 };
 
 export const useDeleteProduct = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosAdmin = useAxiosAdmin();
   const queryClient = useQueryClient();
 
   return useMutation<ApiResponse<null>, Error, string>({
     mutationFn: async (id) => {
-      const response = await axiosPublic.delete<ApiResponse<null>>(`/api/products/${id}`);
+      const response = await axiosAdmin.delete<ApiResponse<null>>(`/api/products/${id}`);
       return response.data;
     },
     onSuccess: () => {
