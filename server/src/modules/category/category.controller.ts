@@ -1,0 +1,107 @@
+import { Request, Response } from 'express';
+import { categoryService } from './category.service';
+import { sendSuccess } from '../../shared/apiResponse';
+import { asyncHandler } from '../../shared/errorHandler';
+import {
+  createCategorySchema,
+  updateCategorySchema,
+  getCategoriesQuerySchema,
+  getCategoryParamsSchema,
+  deleteCategoryParamsSchema,
+} from './category.validation';
+
+/**
+ * Category Controller
+ * Handles HTTP requests and responses
+ */
+
+export class CategoryController {
+  /**
+   * Get all categories
+   * GET /api/categories
+   */
+  getAllCategories = asyncHandler(async (req: Request, res: Response) => {
+    const query = getCategoriesQuerySchema.parse(req.query);
+    
+    const pagination = {
+      page: query.page,
+      limit: query.limit,
+      sortBy: query.sortBy,
+      sortOrder: query.sortOrder,
+    };
+
+    const filters = {
+      status: query.status,
+      search: query.search,
+    };
+
+    const result = await categoryService.getAllCategories(pagination, filters);
+    return sendSuccess(res, result, 'Categories retrieved successfully');
+  });
+
+  /**
+   * Get active categories (public)
+   * GET /api/categories/active
+   */
+  getActiveCategories = asyncHandler(async (req: Request, res: Response) => {
+    const categories = await categoryService.getActiveCategories();
+    return sendSuccess(res, categories, 'Active categories retrieved successfully');
+  });
+
+  /**
+   * Get single category by ID
+   * GET /api/categories/:id
+   */
+  getCategoryById = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = getCategoryParamsSchema.parse(req.params);
+    const category = await categoryService.getCategoryById(id);
+    return sendSuccess(res, category, 'Category retrieved successfully');
+  });
+
+  /**
+   * Get category by slug
+   * GET /api/categories/slug/:slug
+   */
+  getCategoryBySlug = asyncHandler(async (req: Request, res: Response) => {
+    const { slug } = req.params;
+    if (!slug) {
+      return sendSuccess(res, null, 'Slug is required');
+    }
+    const category = await categoryService.getCategoryBySlug(slug);
+    return sendSuccess(res, category, 'Category retrieved successfully');
+  });
+
+  /**
+   * Create new category
+   * POST /api/categories
+   */
+  createCategory = asyncHandler(async (req: Request, res: Response) => {
+    const data = createCategorySchema.parse(req.body);
+    const category = await categoryService.createCategory(data);
+    return sendSuccess(res, category, 'Category created successfully', 201);
+  });
+
+  /**
+   * Update category
+   * PUT /api/categories/:id
+   */
+  updateCategory = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = getCategoryParamsSchema.parse(req.params);
+    const data = updateCategorySchema.parse({ ...req.body, id });
+    const category = await categoryService.updateCategory(id, data);
+    return sendSuccess(res, category, 'Category updated successfully');
+  });
+
+  /**
+   * Delete category
+   * DELETE /api/categories/:id
+   */
+  deleteCategory = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = deleteCategoryParamsSchema.parse(req.params);
+    await categoryService.deleteCategory(id);
+    return sendSuccess(res, null, 'Category deleted successfully');
+  });
+}
+
+export const categoryController = new CategoryController();
+
