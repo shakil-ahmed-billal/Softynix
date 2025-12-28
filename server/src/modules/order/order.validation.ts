@@ -16,8 +16,8 @@ export const createOrderSchema = z.object({
   transactionId: z.string().min(1, 'Transaction ID is required'),
   items: z.array(
     z.object({
-      productId: z.string().uuid('Invalid product ID'),
-      quantity: z.number().int().positive('Quantity must be positive'),
+      productId: z.string().min(1, 'Product ID is required').trim(),
+      quantity: z.coerce.number().int().positive('Quantity must be a positive integer'),
     })
   ).min(1, 'At least one item is required'),
 });

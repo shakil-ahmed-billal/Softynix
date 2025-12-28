@@ -46,8 +46,11 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  category   Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category   Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
+  reviews    Review[]
+  userAccess UserProductAccess[]
+  course     Course?
 
   @@index([categoryId])
   @@index([slug])
@@ -74,8 +77,10 @@ model Order {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  user  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
-  items OrderItem[]
+  user       User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items      OrderItem[]
+  reviews    Review[]
+  userAccess UserProductAccess[]
 
   @@index([orderNumber])
   @@index([status])
@@ -94,8 +99,9 @@ model OrderItem {
   subtotal  Decimal  @db.Decimal(10, 2)
   createdAt DateTime @default(now())
 
-  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order      Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userAccess UserProductAccess?
 
   @@index([orderId])
   @@index([productId])
@@ -129,9 +135,105 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  orders Order[]
+  orders        Order[]
+  reviews       Review[]
+  productAccess UserProductAccess[]
 
   @@index([email])
   @@index([status])
   @@map("users")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String?
+  productId String?
+  orderId   String?
+  rating    Int // 1-5
+  comment   String?  @db.Text
+  status    String   @default("pending") // pending, approved, rejected
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order   Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([productId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("reviews")
+}
+
+// User Product Access - Stores access details for purchased products
+model UserProductAccess {
+  id          String @id @default(uuid())
+  userId      String
+  orderId     String
+  orderItemId String // Link to specific order item
+  productId   String
+  productType String // ai_subscription, software_license, productivity_app, course, etc.
+
+  // Access credentials (encrypted in production)
+  email       String? // For subscriptions/apps
+  password    String? // For subscriptions/apps (should be encrypted)
+  licenseKey  String? // For software licenses
+  accessUrl   String? // Direct access URL
+  downloadUrl String? // Download link for software
+
+  // Course specific
+  courseProgress Int?    @default(0) // 0-100
+  courseStatus   String? // not_started, in_progress, completed
+
+  // Subscription specific
+  subscriptionStatus String? // active, expired, cancelled
+  expiresAt          DateTime?
+
+  // Additional metadata
+  metadata String? @db.Text // JSON string for additional data
+  notes    String? @db.Text
+  status   String  @default("active") // active, expired, revoked
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([orderItemId]) // One access per order item
+  @@index([userId])
+  @@index([productId])
+  @@index([orderId])
+  @@index([productType])
+  @@index([subscriptionStatus])
+  @@index([status])
+  @@map("user_product_access")
+}
+
+// Course Model - For learning platform courses
+model Course {
+  id          String   @id @default(uuid())
+  productId   String   @unique // Link to product
+  title       String
+  description String?  @db.Text
+  instructor  String?
+  duration    String? // e.g., "10 hours", "4 weeks"
+  level       String? // beginner, intermediate, advanced
+  language    String?  @default("en")
+  thumbnail   String?
+  videoUrl    String? // Course video URL
+  resources   String[] @default([]) // Array of resource URLs
+  modules     String?  @db.Text // JSON string for course modules
+  status      String   @default("active") // active, inactive
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([status])
+  @@map("courses")
 }

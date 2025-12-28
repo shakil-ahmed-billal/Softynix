@@ -9,6 +9,7 @@ import authRoutes from "./modules/auth/auth.routes";
 import categoryRoutes from "./modules/category/category.routes";
 import orderRoutes from "./modules/order/order.routes";
 import productRoutes from "./modules/product/product.routes";
+import userProductAccessRoutes from "./modules/user-product-access/user-product-access.routes";
 
 const app: Application = express();
 
@@ -42,6 +43,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/user-product-access", userProductAccessRoutes);
 
 // 404 handler
 app.use((req, res) => {

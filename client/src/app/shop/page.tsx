@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { FilterSidebar } from "@/components/shop/FilterSidebar";
-import { FeaturedProductsSlider } from "@/components/shop/FeaturedProductsSlider";
+import RecentOrders from "@/components/home/RecentOrders";
 import ProductCard from "@/components/shared/ProductCard";
-import { useAllProducts } from "@/hooks/useAllProducts";
-import { useActiveCategories } from "@/hooks/useCategories";
+import { FeaturedProductsSlider } from "@/components/shop/FeaturedProductsSlider";
+import { FilterSidebar } from "@/components/shop/FilterSidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Grid3x3, List } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -16,7 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import RecentOrders from "@/components/home/RecentOrders";
+import { useAllProducts } from "@/hooks/useAllProducts";
+import { useActiveCategories } from "@/hooks/useCategories";
+import { Grid3x3, List, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export default function ShopPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -29,13 +29,23 @@ export default function ShopPage() {
   const limit = 20;
 
   // Fetch products from API
+  // Only send categoryId if it's a valid UUID and exactly one category is selected
+  const categoryIdToSend = useMemo(() => {
+    if (selectedCategories.length !== 1) return undefined;
+    const catId = selectedCategories[0];
+    // Validate UUID format before sending
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(catId) ? catId : undefined;
+  }, [selectedCategories]);
+
   const { data, isLoading } = useAllProducts({
     page,
     limit,
     sortBy,
     sortOrder,
     search: searchQuery || undefined,
-    categoryId: selectedCategories.length === 1 ? selectedCategories[0] : undefined,
+    categoryId: categoryIdToSend,
     status: "active",
   });
 
@@ -56,14 +66,25 @@ export default function ShopPage() {
     }));
   }, [data]);
 
-  // Filter by price range (client-side since API doesn't support it)
+  // Filter by price range and multiple categories (client-side since API doesn't support it)
   const filteredProducts = useMemo(() => {
-    return formattedProducts.filter(
-      (product) =>
+    return formattedProducts.filter((product) => {
+      // Price range filter
+      const priceMatch =
         product.priceValue >= priceRange[0] &&
-        product.priceValue <= priceRange[1]
-    );
-  }, [formattedProducts, priceRange]);
+        product.priceValue <= priceRange[1];
+
+      // Category filter - if multiple categories selected, show products from any of them
+      // If single category selected, API already filtered it, so show all
+      // If no categories selected, show all
+      const categoryMatch =
+        selectedCategories.length === 0 ||
+        selectedCategories.length === 1 ||
+        selectedCategories.includes(product.categoryId);
+
+      return priceMatch && categoryMatch;
+    });
+  }, [formattedProducts, priceRange, selectedCategories]);
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategories((prev) =>
@@ -110,6 +131,22 @@ export default function ShopPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Presentation/Hero Section */}
+      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background border-b">
+        <div className="container mx-auto px-4 py-12">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl md:text-5xl font-bold">
+              Our Digital Products Store
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Discover premium digital products, software licenses,
+              subscriptions, and more. All products are authentic and ready to
+              use.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Main Shop Content */}
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-6">
@@ -176,7 +213,9 @@ export default function ShopPage() {
                 <SelectContent>
                   <SelectItem value="newest">নতুন প্রোডাক্ট</SelectItem>
                   <SelectItem value="price-low">মূল্য: কম থেকে বেশি</SelectItem>
-                  <SelectItem value="price-high">মূল্য: বেশি থেকে কম</SelectItem>
+                  <SelectItem value="price-high">
+                    মূল্য: বেশি থেকে কম
+                  </SelectItem>
                   <SelectItem value="oldest">পুরাতন প্রোডাক্ট</SelectItem>
                 </SelectContent>
               </Select>
@@ -228,7 +267,10 @@ export default function ShopPage() {
                 }
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                  <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+                  <div
+                    key={i}
+                    className="h-64 bg-muted animate-pulse rounded-lg"
+                  />
                 ))}
               </div>
             ) : filteredProducts.length > 0 ? (
@@ -256,7 +298,8 @@ export default function ShopPage() {
                       Previous
                     </Button>
                     <span className="text-sm text-muted-foreground">
-                      Page {data.pagination.page} of {data.pagination.totalPages}
+                      Page {data.pagination.page} of{" "}
+                      {data.pagination.totalPages}
                     </span>
                     <Button
                       variant="outline"

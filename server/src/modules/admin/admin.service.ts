@@ -274,6 +274,70 @@ export class AdminService {
       recentOrders,
     };
   }
+
+  /**
+   * Get all users with pagination and filters
+   */
+  async getAllUsers(
+    pagination: PaginationParams,
+    filters: FilterParams
+  ): Promise<PaginatedResponse<any>> {
+    const { page = 1, limit = 10 } = pagination;
+    const { status, search } = filters;
+
+    const skip = (page - 1) * limit;
+
+    // Build where clause
+    const where: any = {};
+    if (status) where.status = status;
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { phone: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    // Get users and total count
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          phone: true,
+          avatar: true,
+          status: true,
+          emailVerified: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              orders: true,
+            },
+          },
+          // Don't return password
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.user.count({ where }),
+    ]);
+
+    return {
+      data: users,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
 }
 
 export const adminService = new AdminService();

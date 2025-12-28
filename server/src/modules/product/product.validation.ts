@@ -42,9 +42,16 @@ export const getProductsQuerySchema = z.object({
   sortBy: z.string().optional().default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   status: z.string().optional(),
-  categoryId: z.string().uuid().optional(),
+  categoryId: z.string().uuid('Invalid category ID').optional().or(z.literal('')),
   featured: z.coerce.boolean().optional(),
   search: z.string().optional(),
+}).transform((data) => {
+  // Remove categoryId if it's empty string
+  if (data.categoryId === '') {
+    const { categoryId, ...rest } = data;
+    return rest;
+  }
+  return data;
 });
 
 export const getProductParamsSchema = z.object({

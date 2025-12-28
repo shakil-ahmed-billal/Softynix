@@ -1,6 +1,6 @@
 import { prisma } from '../../lib/prisma';
 import { AppError } from '../../shared/errorHandler';
-import { PaginationParams, FilterParams, PaginatedResponse } from '../../types';
+import { FilterParams, PaginatedResponse, PaginationParams } from '../../types';
 
 /**
  * Order Service
@@ -15,6 +15,145 @@ export class OrderService {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
     return `ORD-${timestamp}-${random}`;
+  }
+
+  /**
+   * Determine product type from category name/slug
+   */
+  private determineProductType(categoryName: string, categorySlug: string, productName: string): string {
+    const nameLower = categoryName.toLowerCase();
+    const slugLower = categorySlug.toLowerCase();
+    const productLower = productName.toLowerCase();
+
+    // Check for AI subscriptions
+    if (
+      nameLower.includes('ai') ||
+      nameLower.includes('subscription') ||
+      slugLower.includes('ai') ||
+      slugLower.includes('subscription') ||
+      productLower.includes('chatgpt') ||
+      productLower.includes('claude') ||
+      productLower.includes('yai')
+    ) {
+      return 'ai_subscription';
+    }
+
+    // Check for software licenses
+    if (
+      nameLower.includes('software') ||
+      nameLower.includes('license') ||
+      slugLower.includes('software') ||
+      slugLower.includes('license')
+    ) {
+      return 'software_license';
+    }
+
+    // Check for productivity apps
+    if (
+      nameLower.includes('productivity') ||
+      nameLower.includes('app') ||
+      slugLower.includes('productivity') ||
+      slugLower.includes('app')
+    ) {
+      return 'productivity_app';
+    }
+
+    // Check for courses
+    if (
+      nameLower.includes('course') ||
+      nameLower.includes('learning') ||
+      nameLower.includes('education') ||
+      slugLower.includes('course') ||
+      slugLower.includes('learning')
+    ) {
+      return 'course';
+    }
+
+    // Default to ai_subscription if unclear
+    return 'ai_subscription';
+  }
+
+  /**
+   * Create UserProductAccess entries for order items
+   */
+  private async createUserProductAccess(
+    tx: any,
+    order: any,
+    orderItems: any[],
+    products: any[]
+  ): Promise<void> {
+    if (!order.userId) {
+      return; // Skip if no user is associated
+    }
+
+    // Get order items with product details
+    const itemsWithProducts = await tx.orderItem.findMany({
+      where: { orderId: order.id },
+      include: {
+        product: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    });
+
+    for (const item of itemsWithProducts) {
+      // Check if access already exists
+      const existingAccess = await tx.userProductAccess.findUnique({
+        where: { orderItemId: item.id },
+      });
+
+      if (existingAccess) {
+        continue; // Skip if already exists
+      }
+
+      const productType = this.determineProductType(
+        item.product.category.name,
+        item.product.category.slug,
+        item.product.name
+      );
+
+      // Generate credentials based on product type
+      let email: string | undefined;
+      let password: string | undefined;
+      let licenseKey: string | undefined;
+      let subscriptionStatus: string | undefined;
+      let expiresAt: Date | undefined;
+
+      if (productType === 'ai_subscription' || productType === 'productivity_app') {
+        // Generate email and password for subscriptions/apps
+        const emailPrefix = order.customerEmail.split('@')[0];
+        email = `${emailPrefix}+${item.product.slug}@softynix.com`;
+        password = `Pass${Math.random().toString(36).substring(2, 10)}!`;
+        subscriptionStatus = 'active';
+        // Set expiry to 1 year from now
+        expiresAt = new Date();
+        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+      } else if (productType === 'software_license') {
+        // Generate license key
+        licenseKey = `LIC-${item.product.slug.toUpperCase()}-${Math.random().toString(36).substring(2, 12).toUpperCase()}`;
+      } else if (productType === 'course') {
+        // Course specific fields
+        subscriptionStatus = 'active';
+      }
+
+      await tx.userProductAccess.create({
+        data: {
+          userId: order.userId,
+          orderId: order.id,
+          orderItemId: item.id,
+          productId: item.productId,
+          productType,
+          email,
+          password,
+          licenseKey,
+          subscriptionStatus,
+          expiresAt,
+          status: 'active',
+        },
+      });
+    }
   }
 
   /**
@@ -145,6 +284,28 @@ export class OrderService {
   }
 
   /**
+   * Get recent orders (public, limited data)
+   */
+  async getRecentOrders(limit: number = 5): Promise<any[]> {
+    const orders = await prisma.order.findMany({
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        orderNumber: true,
+        customerName: true,
+        totalAmount: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    return orders;
+  }
+
+  /**
    * Get single order by ID
    */
   async getOrderById(id: string): Promise<any> {
@@ -238,7 +399,13 @@ export class OrderService {
     }
 
     // Calculate totals and validate stock
-    let totalAmount = new prisma.Decimal(0);
+    // Get Decimal constructor from the first product's price
+    if (products.length === 0 || !products[0]?.price) {
+      throw new AppError('No products found', 400);
+    }
+    
+    const Decimal = (products[0]!.price as any).constructor;
+    let totalAmount = new Decimal(0);
     const orderItems: any[] = [];
 
     for (const item of data.items) {
@@ -252,7 +419,8 @@ export class OrderService {
         throw new AppError(`Insufficient stock for product ${product.name}`, 400);
       }
 
-      const price = new prisma.Decimal(product.price.toString());
+      // product.price is already a Decimal from Prisma, use it directly
+      const price = product.price as any;
       const subtotal = price.mul(item.quantity);
       totalAmount = totalAmount.add(subtotal);
 
@@ -267,20 +435,28 @@ export class OrderService {
     // Create order with items in a transaction
     const order = await prisma.$transaction(async (tx: any) => {
       // Create order
+      const orderData: any = {
+        orderNumber: this.generateOrderNumber(),
+        customerName: data.customerName,
+        customerEmail: data.customerEmail,
+        customerPhone: data.customerPhone,
+        paymentMethod: data.paymentMethod,
+        senderPhone: data.senderPhone,
+        transactionId: data.transactionId,
+        totalAmount: totalAmount,
+        status: 'pending',
+        paymentStatus: 'pending',
+      };
+
+      // Link to user if logged in (use relation syntax)
+      if (data.userId) {
+        orderData.user = {
+          connect: { id: data.userId },
+        };
+      }
+
       const newOrder = await tx.order.create({
-        data: {
-          orderNumber: this.generateOrderNumber(),
-          userId: data.userId || null, // Link to user if logged in
-          customerName: data.customerName,
-          customerEmail: data.customerEmail,
-          customerPhone: data.customerPhone,
-          paymentMethod: data.paymentMethod,
-          senderPhone: data.senderPhone,
-          transactionId: data.transactionId,
-          totalAmount: totalAmount,
-          status: 'pending',
-          paymentStatus: 'pending',
-        },
+        data: orderData,
       });
 
       // Create order items
@@ -306,6 +482,12 @@ export class OrderService {
         });
       }
 
+      // Create UserProductAccess entries if user is logged in
+      // We'll create them even for pending orders, they'll be activated when payment is confirmed
+      if (newOrder.userId) {
+        await this.createUserProductAccess(tx, newOrder, orderItems, products);
+      }
+
       // Return order with items
       return tx.order.findUnique({
         where: { id: newOrder.id },
@@ -313,11 +495,8 @@ export class OrderService {
           items: {
             include: {
               product: {
-                select: {
-                  id: true,
-                  name: true,
-                  slug: true,
-                  image: true,
+                include: {
+                  category: true,
                 },
               },
             },
@@ -344,6 +523,17 @@ export class OrderService {
     // Check if order exists
     const existingOrder = await prisma.order.findUnique({
       where: { id },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                category: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!existingOrder) {
@@ -363,17 +553,35 @@ export class OrderService {
         items: {
           include: {
             product: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-                image: true,
+              include: {
+                category: true,
               },
             },
           },
         },
       },
     });
+
+    // If payment status changed to 'paid' and user exists, create/activate UserProductAccess
+    if (
+      data.paymentStatus === 'paid' &&
+      order.userId &&
+      existingOrder.paymentStatus !== 'paid'
+    ) {
+      await prisma.$transaction(async (tx: any) => {
+        // Get products for the order
+        const products = await tx.product.findMany({
+          where: {
+            id: { in: order.items.map((item: any) => item.productId) },
+          },
+          include: {
+            category: true,
+          },
+        });
+
+        await this.createUserProductAccess(tx, order, order.items, products);
+      });
+    }
 
     return order;
   }

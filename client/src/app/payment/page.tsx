@@ -112,10 +112,10 @@ export default function PaymentPage() {
     setIsSubmitting(true);
 
     try {
-      // Prepare order items
+      // Prepare order items - ensure proper data types
       const orderItems = cartItems.map((item) => ({
         productId: String(item.id),
-        quantity: item.quantity,
+        quantity: Number(item.quantity) || 1,
       }));
 
       // Create order with payment info

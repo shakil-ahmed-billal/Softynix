@@ -3,12 +3,22 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// Ensure DATABASE_URL is set
+const databaseUrl = process.env["DATABASE_URL"];
+
+if (!databaseUrl) {
+  throw new Error(
+    'DATABASE_URL environment variable is not set. Please add it to your .env file.\n' +
+    'Format: DATABASE_URL="postgresql://username:password@localhost:5432/database_name?schema=public"'
+  );
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: databaseUrl,
   },
 });

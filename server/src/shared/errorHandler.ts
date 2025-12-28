@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { sendError } from './apiResponse';
 
@@ -28,12 +28,16 @@ export const errorHandler = (
 ): Response => {
   // Handle Zod validation errors
   if (err instanceof ZodError) {
-    const errors = err.errors && Array.isArray(err.errors) 
-      ? err.errors.map((error) => ({
+    const errors = err.issues && Array.isArray(err.issues) 
+      ? err.issues.map((error: any) => ({
           field: error.path.join('.'),
           message: error.message,
         }))
       : [{ field: 'unknown', message: 'Validation failed' }];
+
+    // Log validation errors for debugging
+    console.error('Validation errors:', JSON.stringify(errors, null, 2));
+    console.error('Request body:', JSON.stringify(req.body, null, 2));
 
     return sendError(res, 'Validation failed', errors, 400);
   }

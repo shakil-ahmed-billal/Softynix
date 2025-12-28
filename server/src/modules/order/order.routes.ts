@@ -12,6 +12,9 @@ const router = Router();
 router.post('/', optionalUserAuth, orderController.createOrder);
 router.get('/number/:orderNumber', orderController.getOrderByOrderNumber);
 
+// Public route for recent orders (limited data)
+router.get('/recent', orderController.getRecentOrders);
+
 // User routes (get own orders)
 router.get('/my-orders', userAuth, orderController.getMyOrders);
 
