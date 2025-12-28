@@ -8,9 +8,12 @@ import { ORDER_STATUS, PAYMENT_STATUS } from '../../shared/constants';
 export const createOrderSchema = z.object({
   customerName: z.string().min(1, 'Customer name is required').max(200),
   customerEmail: z.string().email('Invalid email address'),
-  customerPhone: z.string().optional(),
-  shippingAddress: z.string().optional(),
-  notes: z.string().optional(),
+  customerPhone: z.string().min(1, 'Phone number is required'),
+  paymentMethod: z.enum(['Bkash', 'Nagad', 'Rocket', 'Upay'], {
+    errorMap: () => ({ message: 'Payment method must be Bkash, Nagad, Rocket, or Upay' }),
+  }),
+  senderPhone: z.string().min(1, 'Sender phone number is required'),
+  transactionId: z.string().min(1, 'Transaction ID is required'),
   items: z.array(
     z.object({
       productId: z.string().uuid('Invalid product ID'),
@@ -26,6 +29,7 @@ export const updateOrderSchema = z.object({
     ORDER_STATUS.SHIPPED,
     ORDER_STATUS.DELIVERED,
     ORDER_STATUS.CANCELLED,
+    'completed', // Add completed status
   ]).optional(),
   paymentStatus: z.enum([
     PAYMENT_STATUS.PENDING,

@@ -121,6 +121,48 @@ export class AuthService {
   }
 
   /**
+   * Admin login
+   */
+  async adminLogin(email: string, password: string): Promise<{ admin: any; token: string }> {
+    // Find admin
+    const admin = await prisma.adminUser.findUnique({
+      where: { email },
+    });
+
+    if (!admin) {
+      throw new AppError('Invalid email or password', 401);
+    }
+
+    // Check if admin is active
+    if (admin.status !== 'active') {
+      throw new AppError('Account is inactive. Please contact support.', 403);
+    }
+
+    // Verify password (for now, simple comparison - in production use bcrypt)
+    // TODO: Implement proper password hashing for admin users
+    const isPasswordValid = password === admin.password;
+
+    if (!isPasswordValid) {
+      throw new AppError('Invalid email or password', 401);
+    }
+
+    // Generate token
+    const token = generateToken({
+      userId: admin.id,
+      email: admin.email,
+      type: 'admin',
+    });
+
+    // Return admin without password
+    const { password: _, ...adminWithoutPassword } = admin;
+
+    return {
+      admin: adminWithoutPassword,
+      token,
+    };
+  }
+
+  /**
    * Get user profile
    */
   async getProfile(userId: string): Promise<any> {

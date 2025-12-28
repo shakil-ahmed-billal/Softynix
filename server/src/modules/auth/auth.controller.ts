@@ -75,6 +75,16 @@ export class AuthController {
     await authService.changePassword(userId, currentPassword, newPassword);
     return sendSuccess(res, null, 'Password changed successfully');
   });
+
+  /**
+   * Admin login
+   * POST /api/auth/admin/login
+   */
+  adminLogin = asyncHandler(async (req: Request, res: Response) => {
+    const { email, password } = loginSchema.parse(req.body);
+    const result = await authService.adminLogin(email, password);
+    return sendSuccess(res, result, 'Admin login successful');
+  });
 }
 
 export const authController = new AuthController();

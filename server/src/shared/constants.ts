@@ -15,6 +15,7 @@ export const CATEGORY_STATUS = {
 
 export const ORDER_STATUS = {
   PENDING: 'pending',
+  COMPLETED: 'completed',
   PROCESSING: 'processing',
   SHIPPED: 'shipped',
   DELIVERED: 'delivered',

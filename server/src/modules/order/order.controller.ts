@@ -66,11 +66,13 @@ export class OrderController {
   /**
    * Create new order
    * POST /api/orders
+   * Can be used by both authenticated and unauthenticated users
    */
   createOrder = asyncHandler(async (req: Request, res: Response) => {
     const data = createOrderSchema.parse(req.body);
-    // Get userId from authenticated user if available
-    const userId = (req as any).user?.userId;
+    // Get userId from authenticated user if available (optional)
+    const authReq = req as any;
+    const userId = authReq.user?.userId || authReq.user?.id || null;
     const order = await orderService.createOrder({ ...data, userId });
     return sendSuccess(res, order, 'Order created successfully', 201);
   });

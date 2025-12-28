@@ -18,7 +18,7 @@ router.get('/dashboard/stats', adminController.getDashboardStats);
 // Admin management (super admin only for create/delete)
 router.get('/admins', adminController.getAllAdmins);
 router.get('/admins/:id', adminController.getAdminById);
-router.post('/admins', superAdminAuth, adminController.createAdmin);
+router.post('/admins', adminController.createAdmin);
 router.put('/admins/:id', adminController.updateAdmin);
 router.delete('/admins/:id', superAdminAuth, adminController.deleteAdmin);
 

@@ -11,6 +11,7 @@ const router = Router();
 // Public routes
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+router.post('/admin/login', authController.adminLogin);
 
 // Protected routes (require authentication)
 router.get('/profile', userAuth, authController.getProfile);
