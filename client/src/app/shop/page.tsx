@@ -4,10 +4,11 @@ import { useState, useMemo } from "react";
 import { FilterSidebar } from "@/components/shop/FilterSidebar";
 import { FeaturedProductsSlider } from "@/components/shop/FeaturedProductsSlider";
 import ProductCard from "@/components/shared/ProductCard";
-import { allProducts, Product } from "@/lib/dummy-data";
+import { useAllProducts } from "@/hooks/useAllProducts";
+import { useActiveCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Grid3x3, List, SlidersHorizontal } from "lucide-react";
+import { Search, Grid3x3, List } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -18,71 +19,93 @@ import {
 import RecentOrders from "@/components/home/RecentOrders";
 
 export default function ShopPage() {
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<string>("default");
+  const [sortBy, setSortBy] = useState<string>("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [page, setPage] = useState(1);
+  const limit = 20;
 
-  // Filter products
+  // Fetch products from API
+  const { data, isLoading } = useAllProducts({
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    search: searchQuery || undefined,
+    categoryId: selectedCategories.length === 1 ? selectedCategories[0] : undefined,
+    status: "active",
+  });
+
+  // Fetch categories for filter
+  const { data: categories } = useActiveCategories();
+
+  // Format products for ProductCard component
+  const formattedProducts = useMemo(() => {
+    if (!data?.data) return [];
+    return data.data.map((p) => ({
+      id: p.id,
+      title: p.name,
+      price: `৳${Number(p.price).toLocaleString()}`,
+      categoryId: p.categoryId,
+      featured: p.featured,
+      priceValue: Number(p.price),
+      image: p.image || "/api/placeholder/300/300",
+    }));
+  }, [data]);
+
+  // Filter by price range (client-side since API doesn't support it)
   const filteredProducts = useMemo(() => {
-    let filtered: Product[] = [...allProducts];
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter((product) =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Category filter
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter((product) =>
-        selectedCategories.includes(product.categoryId)
-      );
-    }
-
-    // Price range filter
-    filtered = filtered.filter(
+    return formattedProducts.filter(
       (product) =>
         product.priceValue >= priceRange[0] &&
         product.priceValue <= priceRange[1]
     );
+  }, [formattedProducts, priceRange]);
 
-    // Sort products
-    switch (sortBy) {
-      case "price-low":
-        filtered.sort((a, b) => a.priceValue - b.priceValue);
-        break;
-      case "price-high":
-        filtered.sort((a, b) => b.priceValue - a.priceValue);
-        break;
-      case "rating":
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case "newest":
-        filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-        break;
-      default:
-        break;
-    }
-
-    return filtered;
-  }, [selectedCategories, priceRange, searchQuery, sortBy]);
-
-  const handleCategoryChange = (categoryId: number) => {
+  const handleCategoryChange = (categoryId: string) => {
     setSelectedCategories((prev) =>
       prev.includes(categoryId)
         ? prev.filter((id) => id !== categoryId)
         : [...prev, categoryId]
     );
+    setPage(1); // Reset to first page
   };
 
   const handleClearFilters = () => {
     setSelectedCategories([]);
-    setPriceRange([0, 10000]);
+    setPriceRange([0, 100000]);
     setSearchQuery("");
-    setSortBy("default");
+    setSortBy("createdAt");
+    setSortOrder("desc");
+    setPage(1);
+  };
+
+  const handleSortChange = (value: string) => {
+    switch (value) {
+      case "price-low":
+        setSortBy("price");
+        setSortOrder("asc");
+        break;
+      case "price-high":
+        setSortBy("price");
+        setSortOrder("desc");
+        break;
+      case "newest":
+        setSortBy("createdAt");
+        setSortOrder("desc");
+        break;
+      case "oldest":
+        setSortBy("createdAt");
+        setSortOrder("asc");
+        break;
+      default:
+        setSortBy("createdAt");
+        setSortOrder("desc");
+    }
+    setPage(1);
   };
 
   return (
@@ -98,6 +121,7 @@ export default function ShopPage() {
               priceRange={priceRange}
               onPriceRangeChange={setPriceRange}
               onClearFilters={handleClearFilters}
+              categories={categories || []}
             />
           </div>
 
@@ -114,6 +138,7 @@ export default function ShopPage() {
                   onPriceRangeChange={setPriceRange}
                   onClearFilters={handleClearFilters}
                   isMobile={true}
+                  categories={categories || []}
                 />
               </div>
 
@@ -124,22 +149,35 @@ export default function ShopPage() {
                   type="search"
                   placeholder="প্রোডাক্ট খুঁজুন..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPage(1);
+                  }}
                   className="pl-10"
                 />
               </div>
 
               {/* Sort Dropdown */}
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select
+                value={
+                  sortBy === "price" && sortOrder === "asc"
+                    ? "price-low"
+                    : sortBy === "price" && sortOrder === "desc"
+                    ? "price-high"
+                    : sortBy === "createdAt" && sortOrder === "desc"
+                    ? "newest"
+                    : "oldest"
+                }
+                onValueChange={handleSortChange}
+              >
                 <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue placeholder="সাজান" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="default">ডিফল্ট</SelectItem>
+                  <SelectItem value="newest">নতুন প্রোডাক্ট</SelectItem>
                   <SelectItem value="price-low">মূল্য: কম থেকে বেশি</SelectItem>
                   <SelectItem value="price-high">মূল্য: বেশি থেকে কম</SelectItem>
-                  <SelectItem value="rating">সর্বোচ্চ রেটিং</SelectItem>
-                  <SelectItem value="newest">নতুন প্রোডাক্ট</SelectItem>
+                  <SelectItem value="oldest">পুরাতন প্রোডাক্ট</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -166,11 +204,22 @@ export default function ShopPage() {
 
             {/* Results Count */}
             <div className="mb-4 text-sm text-muted-foreground">
-              {filteredProducts.length} টি প্রোডাক্ট পাওয়া গেছে
+              {isLoading ? (
+                "লোড হচ্ছে..."
+              ) : (
+                <>
+                  {data?.pagination?.total || 0} টি প্রোডাক্ট পাওয়া গেছে
+                  {filteredProducts.length !== (data?.data?.length || 0) && (
+                    <span className="ml-2">
+                      ({filteredProducts.length} মূল্য পরিসরে)
+                    </span>
+                  )}
+                </>
+              )}
             </div>
 
             {/* Products Grid/List */}
-            {filteredProducts.length > 0 ? (
+            {isLoading ? (
               <div
                 className={
                   viewMode === "grid"
@@ -178,10 +227,51 @@ export default function ShopPage() {
                     : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-6"
                 }
               >
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
                 ))}
               </div>
+            ) : filteredProducts.length > 0 ? (
+              <>
+                <div
+                  className={
+                    viewMode === "grid"
+                      ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6"
+                      : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-6"
+                  }
+                >
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {data?.pagination && data.pagination.totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-8">
+                    <Button
+                      variant="outline"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                    >
+                      Previous
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                      Page {data.pagination.page} of {data.pagination.totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        setPage((p) =>
+                          Math.min(data.pagination.totalPages, p + 1)
+                        )
+                      }
+                      disabled={page === data.pagination.totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <p className="text-lg font-medium mb-2">
@@ -208,4 +298,3 @@ export default function ShopPage() {
     </div>
   );
 }
-

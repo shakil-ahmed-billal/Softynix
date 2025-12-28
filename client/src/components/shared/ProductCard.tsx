@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/contexts/cart-context";
-import { Product } from "@/lib/dummy-data";
+import { Product } from "@/types/product";
+import toast from "react-hot-toast";
 
 interface ProductCardProps {
   product: Product;
@@ -33,6 +34,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     addToCart(product);
+    toast.success("Product added to cart");
   };
 
   return (

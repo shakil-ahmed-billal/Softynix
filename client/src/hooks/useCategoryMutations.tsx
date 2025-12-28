@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useAxiosPublic from "./useAxiosPublic";
+import useAxiosAdmin from "./useAxiosAdmin";
 
 interface CreateCategoryData {
   name: string;
@@ -22,12 +22,12 @@ interface ApiResponse<T> {
 }
 
 export const useCreateCategory = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosAdmin = useAxiosAdmin();
   const queryClient = useQueryClient();
 
   return useMutation<ApiResponse<any>, Error, CreateCategoryData>({
     mutationFn: async (data) => {
-      const response = await axiosPublic.post<ApiResponse<any>>("/api/categories", data);
+      const response = await axiosAdmin.post<ApiResponse<any>>("/api/categories", data);
       return response.data;
     },
     onSuccess: () => {
@@ -37,13 +37,13 @@ export const useCreateCategory = () => {
 };
 
 export const useUpdateCategory = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosAdmin = useAxiosAdmin();
   const queryClient = useQueryClient();
 
   return useMutation<ApiResponse<any>, Error, UpdateCategoryData>({
     mutationFn: async (data) => {
       const { id, ...updateData } = data;
-      const response = await axiosPublic.put<ApiResponse<any>>(
+      const response = await axiosAdmin.put<ApiResponse<any>>(
         `/api/categories/${id}`,
         updateData
       );
@@ -57,12 +57,12 @@ export const useUpdateCategory = () => {
 };
 
 export const useDeleteCategory = () => {
-  const axiosPublic = useAxiosPublic();
+  const axiosAdmin = useAxiosAdmin();
   const queryClient = useQueryClient();
 
   return useMutation<ApiResponse<null>, Error, string>({
     mutationFn: async (id) => {
-      const response = await axiosPublic.delete<ApiResponse<null>>(`/api/categories/${id}`);
+      const response = await axiosAdmin.delete<ApiResponse<null>>(`/api/categories/${id}`);
       return response.data;
     },
     onSuccess: () => {

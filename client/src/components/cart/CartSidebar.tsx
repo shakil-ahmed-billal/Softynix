@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
 import { CartItemCard } from "./CartItemCard";
 import { ShoppingCart, ArrowRight } from "lucide-react";
-import { categories } from "@/lib/dummy-data";
+import { useActiveCategories } from "@/hooks/useCategories";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
@@ -20,11 +20,12 @@ export function CartSidebar() {
     getTotalPrice,
     clearCart,
   } = useCart();
+  const { data: categories } = useActiveCategories();
 
   // Group cart items by category
   const groupedItems = cartItems.reduce((acc, item) => {
-    const category = categories.find((cat) => cat.id === item.categoryId);
-    const categoryName = category?.nameBn || "অন্যান্য";
+    const category = categories?.find((cat) => cat.id === item.categoryId);
+    const categoryName = category?.name || "Other";
     if (!acc[categoryName]) {
       acc[categoryName] = [];
     }

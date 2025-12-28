@@ -1,8 +1,30 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
-import { categories } from "@/lib/dummy-data";
+import { useActiveCategories } from "@/hooks/useCategories";
 import Link from "next/link";
+import { Package } from "lucide-react";
 
 export default function CategorySection() {
+  const { data: categories, isLoading } = useActiveCategories();
+
+  if (isLoading) {
+    return (
+      <section className="relative">
+        <div className="container mx-auto px-4 py-12">
+          <h2 className="text-3xl font-semibold text-center mb-8">
+            জনপ্রিয় ক্যাটাগরি
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative">
       <div className=" container mx-auto px-4 py-12 ">
@@ -10,26 +32,29 @@ export default function CategorySection() {
           জনপ্রিয় ক্যাটাগরি
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((category) => {
-            const IconComponent = category.icon;
-            return (
-              <Link key={category.id} href="/categories">
+          {categories && categories.length > 0 ? (
+            categories.map((category) => (
+              <Link key={category.id} href={`/categories?category=${category.slug}`}>
                 <Card className="hover:shadow-xl transition-all duration-300 cursor-pointer group border-2 hover:border-primary">
                   <CardContent className="flex flex-col items-center justify-center p-6 space-y-2">
                     <div className="bg-muted p-4 rounded-2xl group-hover:bg-muted/80 transition-colors">
-                      <IconComponent className="h-8 w-8 text-primary group-hover:scale-110 transition-transform duration-300" />
+                      <Package className="h-8 w-8 text-primary group-hover:scale-110 transition-transform duration-300" />
                     </div>
                     <p className="text-sm font-medium text-center group-hover:text-primary transition-colors">
-                      {category.nameBn}
+                      {category.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {category.count} প্রোডাক্ট
+                      {category._count?.products || 0} প্রোডাক্ট
                     </p>
                   </CardContent>
                 </Card>
               </Link>
-            );
-          })}
+            ))
+          ) : (
+            <p className="col-span-full text-center text-muted-foreground">
+              No categories available
+            </p>
+          )}
         </div>
       </div>
     </section>

@@ -84,6 +84,11 @@ export const useSignup = () => {
       const response = await axiosPublic.post<AuthResponse>("/api/auth/signup", data);
       const { token, user } = response.data.data;
       setAuthToken(token);
+      // Update store
+      if (typeof window !== "undefined") {
+        const { useAuthStore } = await import("@/store/authStore");
+        useAuthStore.getState().setUser(user);
+      }
       return response.data.data;
     },
     onSuccess: () => {
@@ -101,6 +106,21 @@ export const useLogin = () => {
       const response = await axiosPublic.post<AuthResponse>("/api/auth/login", data);
       const { token, user } = response.data.data;
       setAuthToken(token);
+      // Update store
+      if (typeof window !== "undefined") {
+        const { useAuthStore } = await import("@/store/authStore");
+        useAuthStore.getState().setUser(user);
+        // Update context if available
+        try {
+          const { useAuth } = await import("@/contexts/auth-context");
+          const auth = useAuth();
+          if (auth?.login) {
+            auth.login(user);
+          }
+        } catch (e) {
+          // Context not available yet, that's okay
+        }
+      }
       return response.data.data;
     },
     onSuccess: () => {
@@ -112,8 +132,12 @@ export const useLogin = () => {
 export const useLogout = () => {
   const queryClient = useQueryClient();
 
-  return () => {
+  return async () => {
     removeAuthToken();
+    if (typeof window !== "undefined") {
+      const { useAuthStore } = await import("@/store/authStore");
+      useAuthStore.getState().clearAuth();
+    }
     queryClient.clear();
   };
 };
@@ -184,5 +208,72 @@ export const useChangePassword = () => {
       return response.data;
     },
   });
+};
+
+// Admin login
+interface AdminLoginData {
+  email: string;
+  password: string;
+}
+
+interface AdminAuthResponse {
+  success: boolean;
+  message: string;
+  data: {
+    admin: any;
+    token: string;
+  };
+}
+
+const ADMIN_TOKEN_KEY = "admin_token";
+
+export const getAdminToken = (): string | null => {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(ADMIN_TOKEN_KEY);
+};
+
+export const setAdminToken = (token: string): void => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(ADMIN_TOKEN_KEY, token);
+};
+
+export const removeAdminToken = (): void => {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+};
+
+export const useAdminLogin = () => {
+  const axiosPublic = useAxiosPublic();
+  const queryClient = useQueryClient();
+
+  return useMutation<AdminAuthResponse["data"], Error, AdminLoginData>({
+    mutationFn: async (data) => {
+      const response = await axiosPublic.post<AdminAuthResponse>("/api/auth/admin/login", data);
+      const { token, admin } = response.data.data;
+      setAdminToken(token);
+      // Update store
+      if (typeof window !== "undefined") {
+        const { useAuthStore } = await import("@/store/authStore");
+        useAuthStore.getState().setAdmin(admin);
+      }
+      return response.data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "profile"] });
+    },
+  });
+};
+
+export const useAdminLogout = () => {
+  const queryClient = useQueryClient();
+
+  return async () => {
+    removeAdminToken();
+    if (typeof window !== "undefined") {
+      const { useAuthStore } = await import("@/store/authStore");
+      useAuthStore.getState().clearAuth();
+    }
+    queryClient.clear();
+  };
 };
 
