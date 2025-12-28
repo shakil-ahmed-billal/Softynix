@@ -215,9 +215,10 @@ export class OrderService {
     userId?: string; // Optional: if user is logged in
     customerName: string;
     customerEmail: string;
-    customerPhone?: string;
-    shippingAddress?: string;
-    notes?: string;
+    customerPhone: string;
+    paymentMethod: string;
+    senderPhone: string;
+    transactionId: string;
     items: Array<{
       productId: string;
       quantity: number;
@@ -269,11 +270,13 @@ export class OrderService {
       const newOrder = await tx.order.create({
         data: {
           orderNumber: this.generateOrderNumber(),
+          userId: data.userId || null, // Link to user if logged in
           customerName: data.customerName,
           customerEmail: data.customerEmail,
           customerPhone: data.customerPhone,
-          shippingAddress: data.shippingAddress,
-          notes: data.notes,
+          paymentMethod: data.paymentMethod,
+          senderPhone: data.senderPhone,
+          transactionId: data.transactionId,
           totalAmount: totalAmount,
           status: 'pending',
           paymentStatus: 'pending',

@@ -8,9 +8,23 @@ import { CATEGORY_STATUS } from '../../shared/constants';
 export const createCategorySchema = z.object({
   name: z.string().min(1, 'Category name is required').max(100),
   slug: z.string().min(1, 'Slug is required').max(100).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
-  description: z.string().optional(),
-  image: z.string().url('Invalid image URL').optional().or(z.literal('')),
+  description: z.string().optional().nullable(),
+  image: z.string().optional().nullable().or(z.literal('')),
   status: z.enum([CATEGORY_STATUS.ACTIVE, CATEGORY_STATUS.INACTIVE]).optional().default(CATEGORY_STATUS.ACTIVE),
+}).refine((data) => {
+  // If image is provided, it must be a valid URL or empty string
+  if (data.image && data.image !== '') {
+    try {
+      new URL(data.image);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}, {
+  message: 'Invalid image URL',
+  path: ['image'],
 });
 
 export const updateCategorySchema = createCategorySchema.partial().extend({

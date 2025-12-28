@@ -28,10 +28,12 @@ export const errorHandler = (
 ): Response => {
   // Handle Zod validation errors
   if (err instanceof ZodError) {
-    const errors = err.errors.map((error) => ({
-      field: error.path.join('.'),
-      message: error.message,
-    }));
+    const errors = err.errors && Array.isArray(err.errors) 
+      ? err.errors.map((error) => ({
+          field: error.path.join('.'),
+          message: error.message,
+        }))
+      : [{ field: 'unknown', message: 'Validation failed' }];
 
     return sendError(res, 'Validation failed', errors, 400);
   }

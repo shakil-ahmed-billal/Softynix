@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { orderController } from './order.controller';
-import { adminAuth, userAuth } from '../../lib/auth';
+import { adminAuth, userAuth, optionalUserAuth } from '../../lib/auth';
 
 /**
  * Order Routes
@@ -9,7 +9,7 @@ import { adminAuth, userAuth } from '../../lib/auth';
 const router = Router();
 
 // Public routes (create order - can be used by anyone, but will link to user if authenticated)
-router.post('/', orderController.createOrder);
+router.post('/', optionalUserAuth, orderController.createOrder);
 router.get('/number/:orderNumber', orderController.getOrderByOrderNumber);
 
 // User routes (get own orders)

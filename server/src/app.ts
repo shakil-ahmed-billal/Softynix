@@ -15,8 +15,17 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 app.use(morgan("dev"));
+// middleware connection
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://notice-management-ten.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
