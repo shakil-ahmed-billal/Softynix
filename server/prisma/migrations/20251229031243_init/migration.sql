@@ -32,6 +32,26 @@ CREATE TABLE "products" (
 );
 
 -- CreateTable
+CREATE TABLE "product_credentials" (
+    "id" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "productType" TEXT NOT NULL,
+    "email" TEXT,
+    "password" TEXT,
+    "licenseKey" TEXT,
+    "accessUrl" TEXT,
+    "downloadUrl" TEXT,
+    "subscriptionStatus" TEXT,
+    "expiresAt" TIMESTAMP(3),
+    "metadata" TEXT,
+    "notes" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "product_credentials_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "orders" (
     "id" TEXT NOT NULL,
     "orderNumber" TEXT NOT NULL,
@@ -158,6 +178,23 @@ CREATE TABLE "courses" (
     CONSTRAINT "courses_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "course_lesson_completions" (
+    "id" TEXT NOT NULL,
+    "userProductAccessId" TEXT NOT NULL,
+    "courseId" TEXT NOT NULL,
+    "milestoneId" INTEGER NOT NULL,
+    "moduleId" INTEGER NOT NULL,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "viewed" BOOLEAN NOT NULL DEFAULT false,
+    "completedAt" TIMESTAMP(3),
+    "viewedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "course_lesson_completions_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
 
@@ -184,6 +221,15 @@ CREATE INDEX "products_status_idx" ON "products"("status");
 
 -- CreateIndex
 CREATE INDEX "products_featured_idx" ON "products"("featured");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "product_credentials_productId_key" ON "product_credentials"("productId");
+
+-- CreateIndex
+CREATE INDEX "product_credentials_productId_idx" ON "product_credentials"("productId");
+
+-- CreateIndex
+CREATE INDEX "product_credentials_productType_idx" ON "product_credentials"("productType");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "orders_orderNumber_key" ON "orders"("orderNumber");
@@ -269,8 +315,20 @@ CREATE INDEX "courses_productId_idx" ON "courses"("productId");
 -- CreateIndex
 CREATE INDEX "courses_status_idx" ON "courses"("status");
 
+-- CreateIndex
+CREATE INDEX "course_lesson_completions_userProductAccessId_idx" ON "course_lesson_completions"("userProductAccessId");
+
+-- CreateIndex
+CREATE INDEX "course_lesson_completions_courseId_idx" ON "course_lesson_completions"("courseId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "course_lesson_completions_userProductAccessId_courseId_mile_key" ON "course_lesson_completions"("userProductAccessId", "courseId", "milestoneId", "moduleId");
+
 -- AddForeignKey
 ALTER TABLE "products" ADD CONSTRAINT "products_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "product_credentials" ADD CONSTRAINT "product_credentials_productId_fkey" FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "orders" ADD CONSTRAINT "orders_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -304,3 +362,9 @@ ALTER TABLE "user_product_access" ADD CONSTRAINT "user_product_access_productId_
 
 -- AddForeignKey
 ALTER TABLE "courses" ADD CONSTRAINT "courses_productId_fkey" FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "course_lesson_completions" ADD CONSTRAINT "course_lesson_completions_userProductAccessId_fkey" FOREIGN KEY ("userProductAccessId") REFERENCES "user_product_access"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "course_lesson_completions" ADD CONSTRAINT "course_lesson_completions_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "courses"("id") ON DELETE CASCADE ON UPDATE CASCADE;
