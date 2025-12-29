@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
-import { sendError } from './apiResponse';
+import { sendError } from './apiResponse.js';
 
 /**
  * Custom Application Error

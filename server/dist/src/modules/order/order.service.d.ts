@@ -1,4 +1,4 @@
-import { FilterParams, PaginatedResponse, PaginationParams } from '../../types';
+import { FilterParams, PaginatedResponse, PaginationParams } from '../../types/index.js';
 /**
  * Order Service
  * Handles all business logic for orders

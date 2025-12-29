@@ -1,4 +1,4 @@
-import { PaginationParams, FilterParams, PaginatedResponse } from '../../types';
+import { PaginationParams, FilterParams, PaginatedResponse } from '../../types/index.js';
 /**
  * Product Service
  * Handles all business logic for products

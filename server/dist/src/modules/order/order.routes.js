@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { orderController } from './order.controller';
-import { adminAuth, userAuth, optionalUserAuth } from '../../lib/auth';
+import { orderController } from './order.controller.js';
+import { adminAuth, userAuth, optionalUserAuth } from '../../lib/auth.js';
 /**
  * Order Routes
  */

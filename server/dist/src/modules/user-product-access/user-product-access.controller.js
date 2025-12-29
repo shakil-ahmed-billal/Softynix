@@ -1,6 +1,6 @@
-import { userProductAccessService } from './user-product-access.service';
-import { sendSuccess } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
+import { userProductAccessService } from './user-product-access.service.js';
+import { sendSuccess } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
 export class UserProductAccessController {
     /**
      * Get user's purchases

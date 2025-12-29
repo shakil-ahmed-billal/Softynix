@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import { courseService } from './course.service';
-import { sendSuccess } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
+import { courseService } from './course.service.js';
+import { sendSuccess } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
 import {
   createCourseSchema,
   updateCourseSchema,
   getCoursesQuerySchema,
   getCourseParamsSchema,
   deleteCourseParamsSchema,
-} from './course.validation';
+} from './course.validation.js';
 
 /**
  * Course Controller

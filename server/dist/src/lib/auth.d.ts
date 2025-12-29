@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { TokenPayload } from './jwt';
+import { TokenPayload } from './jwt.js';
 /**
  * Authentication middleware for user and admin routes
  */

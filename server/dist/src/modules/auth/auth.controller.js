@@ -1,8 +1,8 @@
-import { authService } from './auth.service';
-import { sendSuccess } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
-import { signupSchema, loginSchema, updateProfileSchema, changePasswordSchema, } from './auth.validation';
+import { authService } from './auth.service.js';
+import { sendSuccess } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
+import { signupSchema, loginSchema, updateProfileSchema, changePasswordSchema, } from './auth.validation.js';
 /**
  * Auth Controller
  * Handles HTTP requests and responses for authentication

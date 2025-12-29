@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from './prisma';
-import { sendError } from '../shared/apiResponse';
-import { AppError } from '../shared/errorHandler';
-import { verifyToken, extractToken, TokenPayload } from './jwt';
+import { prisma } from './prisma.js';
+import { sendError } from '../shared/apiResponse.js';
+import { AppError } from '../shared/errorHandler.js';
+import { verifyToken, extractToken, TokenPayload } from './jwt.js';
 
 /**
  * Authentication middleware for user and admin routes

@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import { categoryService } from './category.service';
-import { sendSuccess } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
+import { categoryService } from './category.service.js';
+import { sendSuccess } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
 import {
   createCategorySchema,
   updateCategorySchema,
   getCategoriesQuerySchema,
   getCategoryParamsSchema,
   deleteCategoryParamsSchema,
-} from './category.validation';
+} from './category.validation.js';
 
 /**
  * Category Controller

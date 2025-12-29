@@ -1,8 +1,8 @@
-import { productCredentialsService } from './product-credentials.service';
-import { sendSuccess } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
-import { upsertProductCredentialsSchema, getProductCredentialsQuerySchema, getProductCredentialsParamsSchema, deleteProductCredentialsParamsSchema, } from './product-credentials.validation';
+import { productCredentialsService } from './product-credentials.service.js';
+import { sendSuccess } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
+import { upsertProductCredentialsSchema, getProductCredentialsQuerySchema, getProductCredentialsParamsSchema, deleteProductCredentialsParamsSchema, } from './product-credentials.validation.js';
 /**
  * Product Credentials Controller
  * Handles HTTP requests and responses

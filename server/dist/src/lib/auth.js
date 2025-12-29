@@ -1,7 +1,7 @@
-import { prisma } from './prisma';
-import { sendError } from '../shared/apiResponse';
-import { AppError } from '../shared/errorHandler';
-import { verifyToken, extractToken } from './jwt';
+import { prisma } from './prisma.js';
+import { sendError } from '../shared/apiResponse.js';
+import { AppError } from '../shared/errorHandler.js';
+import { verifyToken, extractToken } from './jwt.js';
 /**
  * Admin authentication middleware
  * Checks for admin authentication token in headers

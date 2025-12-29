@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { reviewController } from './review.controller';
-import { userAuth, adminAuth, optionalUserAuth } from '../../lib/auth';
+import { reviewController } from './review.controller.js';
+import { userAuth, adminAuth, optionalUserAuth } from '../../lib/auth.js';
 /**
  * Review Routes
  */

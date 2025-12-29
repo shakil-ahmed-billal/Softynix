@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import { productService } from './product.service';
-import { sendSuccess, sendError } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
+import { productService } from './product.service.js';
+import { sendSuccess, sendError } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
 import {
   createProductSchema,
   updateProductSchema,
   getProductsQuerySchema,
   getProductParamsSchema,
   deleteProductParamsSchema,
-} from './product.validation';
+} from './product.validation.js';
 
 /**
  * Product Controller

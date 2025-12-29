@@ -1,8 +1,8 @@
-import { sendSuccess } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
-import { orderService } from './order.service';
-import { createOrderSchema, deleteOrderParamsSchema, getOrderParamsSchema, getOrdersQuerySchema, updateOrderSchema, } from './order.validation';
+import { sendSuccess } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
+import { orderService } from './order.service.js';
+import { createOrderSchema, deleteOrderParamsSchema, getOrderParamsSchema, getOrdersQuerySchema, updateOrderSchema, } from './order.validation.js';
 /**
  * Order Controller
  * Handles HTTP requests and responses

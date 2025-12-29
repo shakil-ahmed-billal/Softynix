@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { productCredentialsController } from './product-credentials.controller';
-import { adminAuth } from '../../lib/auth';
+import { productCredentialsController } from './product-credentials.controller.js';
+import { adminAuth } from '../../lib/auth.js';
 
 /**
  * Product Credentials Routes

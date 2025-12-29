@@ -1,18 +1,18 @@
 import cors from "cors";
 import express, { Application } from "express";
 import morgan from "morgan";
-import { errorHandler } from "./shared/errorHandler";
+import { errorHandler } from "./shared/errorHandler.js";
 
 // Import routes
-import adminRoutes from "./modules/admin/admin.routes";
-import authRoutes from "./modules/auth/auth.routes";
-import categoryRoutes from "./modules/category/category.routes";
-import courseRoutes from "./modules/course/course.routes";
-import orderRoutes from "./modules/order/order.routes";
-import productRoutes from "./modules/product/product.routes";
-import productCredentialsRoutes from "./modules/product-credentials/product-credentials.routes";
-import reviewRoutes from "./modules/review/review.routes";
-import userProductAccessRoutes from "./modules/user-product-access/user-product-access.routes";
+import adminRoutes from "./modules/admin/admin.routes.js";
+import authRoutes from "./modules/auth/auth.routes.js";
+import categoryRoutes from "./modules/category/category.routes.js";
+import courseRoutes from "./modules/course/course.routes.js";
+import orderRoutes from "./modules/order/order.routes.js";
+import productRoutes from "./modules/product/product.routes.js";
+import productCredentialsRoutes from "./modules/product-credentials/product-credentials.routes.js";
+import reviewRoutes from "./modules/review/review.routes.js";
+import userProductAccessRoutes from "./modules/user-product-access/user-product-access.routes.js";
 
 const app: Application = express();
 

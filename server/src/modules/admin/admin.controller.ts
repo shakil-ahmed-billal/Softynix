@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
-import { sendSuccess } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
-import { adminService } from './admin.service';
+import { sendSuccess } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
+import { adminService } from './admin.service.js';
 import {
   createAdminSchema,
   getAdminParamsSchema,
   getAdminsQuerySchema,
   updateAdminSchema,
-} from './admin.validation';
+} from './admin.validation.js';
 
 /**
  * Admin Controller

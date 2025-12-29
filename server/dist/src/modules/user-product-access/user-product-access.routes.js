@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { userProductAccessController } from './user-product-access.controller';
-import { userAuth } from '../../lib/auth';
+import { userProductAccessController } from './user-product-access.controller.js';
+import { userAuth } from '../../lib/auth.js';
 /**
  * User Product Access Routes
  */

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { productController } from './product.controller';
-import { adminAuth } from '../../lib/auth';
+import { productController } from './product.controller.js';
+import { adminAuth } from '../../lib/auth.js';
 /**
  * Product Routes
  */

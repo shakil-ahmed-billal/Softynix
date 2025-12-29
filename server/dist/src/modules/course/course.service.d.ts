@@ -1,4 +1,4 @@
-import { PaginationParams, FilterParams, PaginatedResponse } from '../../types';
+import { PaginationParams, FilterParams, PaginatedResponse } from '../../types/index.js';
 /**
  * Course Service
  * Handles all business logic for courses

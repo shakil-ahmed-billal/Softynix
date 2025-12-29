@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CATEGORY_STATUS } from '../../shared/constants';
+import { CATEGORY_STATUS } from '../../shared/constants.js';
 /**
  * Category validation schemas
  */

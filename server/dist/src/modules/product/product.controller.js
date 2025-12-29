@@ -1,8 +1,8 @@
-import { productService } from './product.service';
-import { sendSuccess, sendError } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
-import { createProductSchema, updateProductSchema, getProductsQuerySchema, getProductParamsSchema, deleteProductParamsSchema, } from './product.validation';
+import { productService } from './product.service.js';
+import { sendSuccess, sendError } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
+import { createProductSchema, updateProductSchema, getProductsQuerySchema, getProductParamsSchema, deleteProductParamsSchema, } from './product.validation.js';
 /**
  * Product Controller
  * Handles HTTP requests and responses

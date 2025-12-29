@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { authController } from './auth.controller';
-import { userAuth } from '../../lib/auth';
+import { authController } from './auth.controller.js';
+import { userAuth } from '../../lib/auth.js';
 /**
  * Auth Routes
  */

@@ -1,4 +1,4 @@
-import { PaginationParams, FilterParams, PaginatedResponse } from '../../types';
+import { PaginationParams, FilterParams, PaginatedResponse } from '../../types/index.js';
 /**
  * Product Credentials Service
  * Handles management of product credentials that admins can assign to products

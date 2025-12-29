@@ -1,9 +1,7 @@
 import app from "../dist/src/app.js";
-import { prisma } from "../dist/src/lib/prisma.js";
 
-// Ensure database connection is ready for serverless functions
-// Prisma will handle connection pooling automatically
-prisma.$connect().catch(console.error);
+// Prisma Client handles connections automatically in serverless environments
+// No need to explicitly connect - it will connect on first query
 
 export default app;
 

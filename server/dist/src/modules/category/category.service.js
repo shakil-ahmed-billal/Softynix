@@ -1,5 +1,5 @@
-import { prisma } from '../../lib/prisma';
-import { AppError } from '../../shared/errorHandler';
+import { prisma } from '../../lib/prisma.js';
+import { AppError } from '../../shared/errorHandler.js';
 /**
  * Category Service
  * Handles all business logic for categories

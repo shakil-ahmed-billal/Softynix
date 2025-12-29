@@ -1,5 +1,5 @@
 import { ZodError } from 'zod';
-import { sendError } from './apiResponse';
+import { sendError } from './apiResponse.js';
 /**
  * Custom Application Error
  */

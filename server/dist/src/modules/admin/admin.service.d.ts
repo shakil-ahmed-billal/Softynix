@@ -1,4 +1,4 @@
-import { PaginationParams, FilterParams, PaginatedResponse } from '../../types';
+import { PaginationParams, FilterParams, PaginatedResponse } from '../../types/index.js';
 /**
  * Admin Service
  * Handles all business logic for admin users

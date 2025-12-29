@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { reviewService } from './review.service';
-import { sendSuccess, sendError } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
+import { reviewService } from './review.service.js';
+import { sendSuccess, sendError } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
 import {
   createReviewSchema,
   updateReviewSchema,
@@ -10,7 +10,7 @@ import {
   getReviewsQuerySchema,
   getReviewParamsSchema,
   deleteReviewParamsSchema,
-} from './review.validation';
+} from './review.validation.js';
 
 /**
  * Review Controller

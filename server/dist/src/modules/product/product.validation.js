@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PRODUCT_STATUS } from '../../shared/constants';
+import { PRODUCT_STATUS } from '../../shared/constants.js';
 /**
  * Product validation schemas
  */

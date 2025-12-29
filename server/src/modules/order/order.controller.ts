@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import { sendSuccess } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
-import { orderService } from './order.service';
+import { sendSuccess } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
+import { orderService } from './order.service.js';
 import {
   createOrderSchema,
   deleteOrderParamsSchema,
   getOrderParamsSchema,
   getOrdersQuerySchema,
   updateOrderSchema,
-} from './order.validation';
+} from './order.validation.js';
 
 /**
  * Order Controller

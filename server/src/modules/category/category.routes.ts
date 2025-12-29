@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { categoryController } from './category.controller';
-import { adminAuth } from '../../lib/auth';
+import { categoryController } from './category.controller.js';
+import { adminAuth } from '../../lib/auth.js';
 
 /**
  * Category Routes

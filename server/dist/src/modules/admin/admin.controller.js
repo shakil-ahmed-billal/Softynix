@@ -1,8 +1,8 @@
-import { sendSuccess } from '../../shared/apiResponse';
-import { asyncHandler } from '../../shared/errorHandler';
-import { removeUndefined } from '../../lib/utils';
-import { adminService } from './admin.service';
-import { createAdminSchema, getAdminParamsSchema, getAdminsQuerySchema, updateAdminSchema, } from './admin.validation';
+import { sendSuccess } from '../../shared/apiResponse.js';
+import { asyncHandler } from '../../shared/errorHandler.js';
+import { removeUndefined } from '../../lib/utils.js';
+import { adminService } from './admin.service.js';
+import { createAdminSchema, getAdminParamsSchema, getAdminsQuerySchema, updateAdminSchema, } from './admin.validation.js';
 /**
  * Admin Controller
  * Handles HTTP requests and responses

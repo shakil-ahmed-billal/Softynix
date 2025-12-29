@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { adminAuth, superAdminAuth } from '../../lib/auth';
-import { adminController } from './admin.controller';
+import { adminAuth, superAdminAuth } from '../../lib/auth.js';
+import { adminController } from './admin.controller.js';
 /**
  * Admin Routes
  * All routes are protected by admin authentication

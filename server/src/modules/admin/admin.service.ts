@@ -1,6 +1,6 @@
-import { prisma } from '../../lib/prisma';
-import { AppError } from '../../shared/errorHandler';
-import { PaginationParams, FilterParams, PaginatedResponse } from '../../types';
+import { prisma } from '../../lib/prisma.js';
+import { AppError } from '../../shared/errorHandler.js';
+import { PaginationParams, FilterParams, PaginatedResponse } from '../../types/index.js';
 
 /**
  * Admin Service

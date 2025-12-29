@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
-import { prisma } from '../../lib/prisma';
-import { AppError } from '../../shared/errorHandler';
-import { generateToken, TokenPayload } from '../../lib/jwt';
+import { prisma } from '../../lib/prisma.js';
+import { AppError } from '../../shared/errorHandler.js';
+import { generateToken, TokenPayload } from '../../lib/jwt.js';
 
 /**
  * Auth Service

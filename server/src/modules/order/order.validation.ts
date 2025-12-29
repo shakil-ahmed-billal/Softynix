@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ORDER_STATUS, PAYMENT_STATUS } from '../../shared/constants';
+import { ORDER_STATUS, PAYMENT_STATUS } from '../../shared/constants.js';
 
 /**
  * Order validation schemas

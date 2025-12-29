@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { courseController } from './course.controller';
-import { adminAuth } from '../../lib/auth';
+import { courseController } from './course.controller.js';
+import { adminAuth } from '../../lib/auth.js';
 /**
  * Course Routes
  * All routes require admin authentication
