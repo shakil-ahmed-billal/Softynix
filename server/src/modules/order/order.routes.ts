@@ -6,7 +6,7 @@ import { adminAuth, userAuth, optionalUserAuth } from '../../lib/auth';
  * Order Routes
  */
 
-const router = Router();
+const router: Router = Router();
 
 // Public routes (create order - can be used by anyone, but will link to user if authenticated)
 router.post('/', optionalUserAuth, orderController.createOrder);

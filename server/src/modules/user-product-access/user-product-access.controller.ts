@@ -133,6 +133,67 @@ export class UserProductAccessController {
     const updated = await userProductAccessService.updateCourseProgress(id, userId, progress);
     return sendSuccess(res, updated, 'Course progress updated successfully');
   });
+
+  /**
+   * Get lesson completions
+   * GET /api/user-product-access/:id/lesson-completions
+   */
+  getLessonCompletions = asyncHandler(async (req: Request, res: Response) => {
+    const authReq = req as any;
+    const userId = authReq.user?.userId || authReq.user?.id;
+    const { id } = req.params;
+
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    const completions = await userProductAccessService.getLessonCompletions(id, userId);
+    return sendSuccess(res, completions, 'Lesson completions retrieved successfully');
+  });
+
+  /**
+   * Complete a lesson
+   * POST /api/user-product-access/:id/complete-lesson
+   */
+  completeLesson = asyncHandler(async (req: Request, res: Response) => {
+    const authReq = req as any;
+    const userId = authReq.user?.userId || authReq.user?.id;
+    const { id } = req.params;
+    const { milestoneId, moduleId } = req.body;
+
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    if (typeof milestoneId !== 'number' || typeof moduleId !== 'number') {
+      throw new Error('milestoneId and moduleId must be numbers');
+    }
+
+    const completion = await userProductAccessService.completeLesson(id, userId, milestoneId, moduleId);
+    return sendSuccess(res, completion, 'Lesson completed successfully');
+  });
+
+  /**
+   * Mark lesson as viewed
+   * POST /api/user-product-access/:id/view-lesson
+   */
+  markLessonViewed = asyncHandler(async (req: Request, res: Response) => {
+    const authReq = req as any;
+    const userId = authReq.user?.userId || authReq.user?.id;
+    const { id } = req.params;
+    const { milestoneId, moduleId } = req.body;
+
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    if (typeof milestoneId !== 'number' || typeof moduleId !== 'number') {
+      throw new Error('milestoneId and moduleId must be numbers');
+    }
+
+    const completion = await userProductAccessService.markLessonViewed(id, userId, milestoneId, moduleId);
+    return sendSuccess(res, completion, 'Lesson marked as viewed');
+  });
 }
 
 export const userProductAccessController = new UserProductAccessController();

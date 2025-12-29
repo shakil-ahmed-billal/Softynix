@@ -6,7 +6,7 @@ import { userAuth } from '../../lib/auth';
  * Auth Routes
  */
 
-const router = Router();
+const router:Router = Router();
 
 // Public routes
 router.post('/signup', authController.signup);

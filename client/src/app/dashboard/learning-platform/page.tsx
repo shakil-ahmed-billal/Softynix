@@ -91,21 +91,36 @@ export default function LearningPlatformPage() {
         {filtered.map((course) => {
           const courseData = course.product.course;
           const progress = course.courseProgress || 0;
-          const totalLessons = 10; // Default, should come from course data
+          
+          // Parse course modules to get total lessons
+          let totalLessons = 0;
+          if (courseData?.modules) {
+            try {
+              const modules = JSON.parse(courseData.modules);
+              totalLessons = modules.milestones?.reduce(
+                (sum: number, milestone: any) => sum + (milestone.modules?.length || 0),
+                0
+              ) || 0;
+            } catch (e) {
+              totalLessons = 0;
+            }
+          }
+          
           const completedLessons = Math.round((progress / 100) * totalLessons);
           
           return (
-            <CourseCard
-              key={course.id}
-              course={{
-                id: course.id,
-                courseTitle: course.product.name,
-                completedLessons,
-                totalLessons,
-                certificateStatus: progress === 100 ? "available" : "not_available",
-                categoryId: 5,
-              }}
-            />
+            <div key={course.id} onClick={() => window.location.href = `/dashboard/learning-platform/${course.id}`} className="cursor-pointer">
+              <CourseCard
+                course={{
+                  id: course.id,
+                  courseTitle: course.product.name,
+                  completedLessons,
+                  totalLessons,
+                  certificateStatus: progress === 100 ? "available" : "not_available",
+                  categoryId: 5,
+                }}
+              />
+            </div>
           );
         })}
       </div>

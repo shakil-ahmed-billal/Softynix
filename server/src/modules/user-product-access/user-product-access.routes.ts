@@ -6,7 +6,7 @@ import { userAuth } from '../../lib/auth';
  * User Product Access Routes
  */
 
-const router = Router();
+const router: Router = Router();
 
 // All routes require authentication
 router.get('/purchases', userAuth, userProductAccessController.getMyPurchases);
@@ -15,7 +15,10 @@ router.get('/software-licenses', userAuth, userProductAccessController.getMySoft
 router.get('/productivity-apps', userAuth, userProductAccessController.getMyProductivityApps);
 router.get('/courses', userAuth, userProductAccessController.getMyCourses);
 router.get('/:id', userAuth, userProductAccessController.getProductAccess);
+router.get('/:id/lesson-completions', userAuth, userProductAccessController.getLessonCompletions);
 router.put('/:id/course-progress', userAuth, userProductAccessController.updateCourseProgress);
+router.post('/:id/complete-lesson', userAuth, userProductAccessController.completeLesson);
+router.post('/:id/view-lesson', userAuth, userProductAccessController.markLessonViewed);
 
 export default router;
 

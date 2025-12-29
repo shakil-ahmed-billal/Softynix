@@ -46,17 +46,49 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  category   Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
-  reviews    Review[]
-  userAccess UserProductAccess[]
-  course     Course?
+  category           Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems         OrderItem[]
+  reviews            Review[]
+  userAccess         UserProductAccess[]
+  course             Course?
+  productCredentials ProductCredentials?
 
   @@index([categoryId])
   @@index([slug])
   @@index([status])
   @@index([featured])
   @@map("products")
+}
+
+// Product Credentials - Admin-managed credentials templates for products
+model ProductCredentials {
+  id          String @id @default(uuid())
+  productId   String @unique
+  productType String // ai_subscription, software_license, productivity_app, course, etc.
+
+  // Access credentials
+  email       String?
+  password    String? @db.Text
+  licenseKey  String? @db.Text
+  accessUrl   String? @db.Text
+  downloadUrl String? @db.Text
+
+  // Subscription specific
+  subscriptionStatus String?
+  expiresAt          DateTime?
+
+  // Additional metadata
+  metadata String? @db.Text // JSON string for additional data
+  notes    String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([productType])
+  @@map("product_credentials")
 }
 
 model Order {
@@ -198,10 +230,11 @@ model UserProductAccess {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
-  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order             Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderItem         OrderItem                @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  product           Product                  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  lessonCompletions CourseLessonCompletion[]
 
   @@unique([orderItemId]) // One access per order item
   @@index([userId])
@@ -231,9 +264,33 @@ model Course {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product           Product                  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  lessonCompletions CourseLessonCompletion[]
 
   @@index([productId])
   @@index([status])
   @@map("courses")
+}
+
+// Course Lesson Completion - Track individual lesson completion per user
+model CourseLessonCompletion {
+  id                  String    @id @default(uuid())
+  userProductAccessId String // Link to user's course access
+  courseId            String
+  milestoneId         Int // From course JSON structure
+  moduleId            Int // From course JSON structure
+  completed           Boolean   @default(false)
+  viewed              Boolean   @default(false)
+  completedAt         DateTime?
+  viewedAt            DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  userProductAccess UserProductAccess @relation(fields: [userProductAccessId], references: [id], onDelete: Cascade)
+  course            Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userProductAccessId, courseId, milestoneId, moduleId])
+  @@index([userProductAccessId])
+  @@index([courseId])
+  @@map("course_lesson_completions")
 }

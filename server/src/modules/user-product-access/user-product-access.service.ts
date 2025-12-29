@@ -306,6 +306,182 @@ export class UserProductAccessService {
 
     return updatedAccess;
   }
+
+  /**
+   * Get lesson completions for a course access
+   */
+  async getLessonCompletions(accessId: string, userId: string): Promise<any[]> {
+    // Verify ownership
+    const access = await prisma.userProductAccess.findFirst({
+      where: {
+        id: accessId,
+        userId,
+        productType: 'course',
+      },
+      include: {
+        product: {
+          include: {
+            course: true,
+          },
+        },
+      },
+    });
+
+    if (!access || !access.product.course) {
+      throw new AppError('Course access not found', 404);
+    }
+
+    const completions = await prisma.courseLessonCompletion.findMany({
+      where: {
+        userProductAccessId: accessId,
+        courseId: access.product.course.id,
+      },
+    });
+
+    return completions;
+  }
+
+  /**
+   * Complete a lesson
+   */
+  async completeLesson(
+    accessId: string,
+    userId: string,
+    milestoneId: number,
+    moduleId: number
+  ): Promise<any> {
+    // Verify ownership
+    const access = await prisma.userProductAccess.findFirst({
+      where: {
+        id: accessId,
+        userId,
+        productType: 'course',
+      },
+      include: {
+        product: {
+          include: {
+            course: true,
+          },
+        },
+      },
+    });
+
+    if (!access || !access.product.course) {
+      throw new AppError('Course access not found', 404);
+    }
+
+    // Upsert lesson completion
+    const completion = await prisma.courseLessonCompletion.upsert({
+      where: {
+        userProductAccessId_courseId_milestoneId_moduleId: {
+          userProductAccessId: accessId,
+          courseId: access.product.course.id,
+          milestoneId,
+          moduleId,
+        },
+      },
+      update: {
+        completed: true,
+        viewed: true,
+        completedAt: new Date(),
+        viewedAt: new Date(),
+      },
+      create: {
+        userProductAccessId: accessId,
+        courseId: access.product.course.id,
+        milestoneId,
+        moduleId,
+        completed: true,
+        viewed: true,
+        completedAt: new Date(),
+        viewedAt: new Date(),
+      },
+    });
+
+    // Calculate new progress
+    const courseData = JSON.parse(access.product.course.modules || '{}');
+    const totalLessons = courseData.milestones?.reduce(
+      (sum: number, milestone: any) => sum + (milestone.modules?.length || 0),
+      0
+    ) || 1;
+
+    const completedLessons = await prisma.courseLessonCompletion.count({
+      where: {
+        userProductAccessId: accessId,
+        courseId: access.product.course.id,
+        completed: true,
+      },
+    });
+
+    const newProgress = Math.round((completedLessons / totalLessons) * 100);
+
+    // Update course progress
+    await prisma.userProductAccess.update({
+      where: { id: accessId },
+      data: {
+        courseProgress: newProgress,
+        courseStatus: newProgress === 100 ? 'completed' : 'in_progress',
+      },
+    });
+
+    return completion;
+  }
+
+  /**
+   * Mark lesson as viewed
+   */
+  async markLessonViewed(
+    accessId: string,
+    userId: string,
+    milestoneId: number,
+    moduleId: number
+  ): Promise<any> {
+    // Verify ownership
+    const access = await prisma.userProductAccess.findFirst({
+      where: {
+        id: accessId,
+        userId,
+        productType: 'course',
+      },
+      include: {
+        product: {
+          include: {
+            course: true,
+          },
+        },
+      },
+    });
+
+    if (!access || !access.product.course) {
+      throw new AppError('Course access not found', 404);
+    }
+
+    // Upsert lesson completion (viewed only)
+    const completion = await prisma.courseLessonCompletion.upsert({
+      where: {
+        userProductAccessId_courseId_milestoneId_moduleId: {
+          userProductAccessId: accessId,
+          courseId: access.product.course.id,
+          milestoneId,
+          moduleId,
+        },
+      },
+      update: {
+        viewed: true,
+        viewedAt: new Date(),
+      },
+      create: {
+        userProductAccessId: accessId,
+        courseId: access.product.course.id,
+        milestoneId,
+        moduleId,
+        viewed: true,
+        viewedAt: new Date(),
+      },
+    });
+
+    return completion;
+  }
 }
 
 export const userProductAccessService = new UserProductAccessService();

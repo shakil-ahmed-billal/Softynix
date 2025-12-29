@@ -7,7 +7,7 @@ import { adminController } from './admin.controller';
  * All routes are protected by admin authentication
  */
 
-const router = Router();
+const router: Router = Router();
 
 // All admin routes require authentication
 router.use(adminAuth);
