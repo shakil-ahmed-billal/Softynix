@@ -11,17 +11,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAllOrders } from "@/hooks/useOrders";
+import { useRecentOrders } from "@/hooks/useRecentOrders";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function RecentOrders() {
-  const { data, isLoading } = useAllOrders({
-    page: 1,
-    limit: 5,
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  });
+  const { data, isLoading } = useRecentOrders(5);
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -67,8 +62,8 @@ export default function RecentOrders() {
                       Loading...
                     </TableCell>
                   </TableRow>
-                ) : data?.data && data.data.length > 0 ? (
-                  data.data.map((order) => (
+                ) : data && data.length > 0 ? (
+                  data.map((order) => (
                     <TableRow
                       key={order.id}
                       className="hover:bg-muted/50 transition-colors"

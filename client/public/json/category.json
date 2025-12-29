@@ -1,0 +1,62 @@
+[
+  {
+    "id": "c1a1e1f1-0001-4a01-9001-111111111111",
+    "name": "AI Solutions",
+    "slug": "ai-solutions",
+    "description": "AI subscription based digital services",
+    "image": "https://example.com/images/ai.png",
+    "status": "active",
+    "createdAt": "2025-12-29 03:17:11.451",
+    "updatedAt": "2025-12-29 03:17:11.451"
+  },
+  {
+    "id": "c1a1e1f1-0003-4a01-9001-333333333333",
+    "name": "Utility Tools",
+    "slug": "utility-tools",
+    "description": "Creative and utility tools",
+    "image": "https://example.com/images/tools.png",
+    "status": "active",
+    "createdAt": "2025-12-29 03:17:11.451",
+    "updatedAt": "2025-12-29 03:17:11.451"
+  },
+  {
+    "id": "c1a1e1f1-0004-4a01-9001-444444444444",
+    "name": "Software & Apps",
+    "slug": "software-apps",
+    "description": "Productivity apps and software",
+    "image": "https://example.com/images/apps.png",
+    "status": "active",
+    "createdAt": "2025-12-29 03:17:11.451",
+    "updatedAt": "2025-12-29 03:17:11.451"
+  },
+  {
+    "id": "c1a1e1f1-0005-4a01-9001-555555555555",
+    "name": "Learning Courses",
+    "slug": "learning-courses",
+    "description": "Online learning platforms",
+    "image": "https://example.com/images/learning.png",
+    "status": "active",
+    "createdAt": "2025-12-29 03:17:11.451",
+    "updatedAt": "2025-12-29 03:17:11.451"
+  },
+  {
+    "id": "c1a1e1f1-0006-4a03-9002-666666666666",
+    "name": "Software Licenses",
+    "slug": "software-licenses",
+    "description": "Online Software Licenses",
+    "image": "https://example.com/images/licenses.png",
+    "status": "active",
+    "createdAt": "2025-12-29 03:17:11.451",
+    "updatedAt": "2025-12-29 03:17:11.451"
+  },
+  {
+    "id": "c1a1e1f1-0002-4a01-9001-222222222222",
+    "name": "Productivity Apps",
+    "slug": "productivity-apps",
+    "description": "Business and enterprise software licenses",
+    "image": "https://example.com/images/productivity-apps.png",
+    "status": "active",
+    "createdAt": "2025-12-29 03:17:11.451",
+    "updatedAt": "2025-12-28 23:07:20.717"
+  }
+]

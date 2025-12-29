@@ -27,6 +27,7 @@ import {
   Shield,
   ShoppingBag,
   Sprout,
+  Star,
   User,
   User2,
   Zap,
@@ -75,6 +76,7 @@ const mainCategories = [
 
 const secondaryNav = [
   { title: "My Purchases", icon: ShoppingBag, url: "/dashboard/purchases" },
+  { title: "My Reviews", icon: Star, url: "/dashboard/reviews" },
   { title: "Billing & Cards", icon: CreditCard, url: "/dashboard/billing" },
   { title: "Profile", icon: User, url: "/dashboard/profile" },
   { title: "Security", icon: Shield, url: "/dashboard/security" },

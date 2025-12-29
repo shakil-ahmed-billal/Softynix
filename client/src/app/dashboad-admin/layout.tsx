@@ -13,6 +13,9 @@ import {
   Users,
   X,
   Clock,
+  GraduationCap,
+  Key,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -35,6 +38,16 @@ const sidebarItems = [
     icon: FolderTree,
   },
   {
+    title: "Courses",
+    href: "/dashboad-admin/courses",
+    icon: GraduationCap,
+  },
+  {
+    title: "Product Credentials",
+    href: "/dashboad-admin/product-credentials",
+    icon: Key,
+  },
+  {
     title: "Pending Orders",
     href: "/dashboad-admin/pending-orders",
     icon: Clock,
@@ -48,6 +61,11 @@ const sidebarItems = [
     title: "Users",
     href: "/dashboad-admin/users",
     icon: Users,
+  },
+  {
+    title: "Reviews",
+    href: "/dashboad-admin/reviews",
+    icon: Star,
   },
   {
     title: "Settings",

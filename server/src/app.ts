@@ -7,8 +7,12 @@ import { errorHandler } from "./shared/errorHandler";
 import adminRoutes from "./modules/admin/admin.routes";
 import authRoutes from "./modules/auth/auth.routes";
 import categoryRoutes from "./modules/category/category.routes";
+import courseRoutes from "./modules/course/course.routes";
 import orderRoutes from "./modules/order/order.routes";
 import productRoutes from "./modules/product/product.routes";
+import productCredentialsRoutes from "./modules/product-credentials/product-credentials.routes";
+import reviewRoutes from "./modules/review/review.routes";
+import userProductAccessRoutes from "./modules/user-product-access/user-product-access.routes";
 
 const app: Application = express();
 
@@ -40,8 +44,12 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/courses", courseRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/product-credentials", productCredentialsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/user-product-access", userProductAccessRoutes);
 
 // 404 handler
 app.use((req, res) => {

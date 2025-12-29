@@ -6,7 +6,7 @@ import { adminAuth } from '../../lib/auth';
  * Product Routes
  */
 
-const router = Router();
+const router: Router = Router();
 
 // Public routes
 router.get('/', productController.getAllProducts);

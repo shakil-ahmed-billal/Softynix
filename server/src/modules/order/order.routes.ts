@@ -6,11 +6,14 @@ import { adminAuth, userAuth, optionalUserAuth } from '../../lib/auth';
  * Order Routes
  */
 
-const router = Router();
+const router: Router = Router();
 
 // Public routes (create order - can be used by anyone, but will link to user if authenticated)
 router.post('/', optionalUserAuth, orderController.createOrder);
 router.get('/number/:orderNumber', orderController.getOrderByOrderNumber);
+
+// Public route for recent orders (limited data)
+router.get('/recent', orderController.getRecentOrders);
 
 // User routes (get own orders)
 router.get('/my-orders', userAuth, orderController.getMyOrders);

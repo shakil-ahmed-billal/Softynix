@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { orderService } from './order.service';
 import { sendSuccess } from '../../shared/apiResponse';
 import { asyncHandler } from '../../shared/errorHandler';
+import { orderService } from './order.service';
 import {
   createOrderSchema,
-  updateOrderSchema,
-  getOrdersQuerySchema,
-  getOrderParamsSchema,
   deleteOrderParamsSchema,
+  getOrderParamsSchema,
+  getOrdersQuerySchema,
+  updateOrderSchema,
 } from './order.validation';
 
 /**
@@ -16,6 +16,16 @@ import {
  */
 
 export class OrderController {
+  /**
+   * Get recent orders (public endpoint)
+   * GET /api/orders/recent
+   */
+  getRecentOrders = asyncHandler(async (req: Request, res: Response) => {
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+    const orders = await orderService.getRecentOrders(limit);
+    return sendSuccess(res, orders, 'Recent orders retrieved successfully');
+  });
+
   /**
    * Get all orders
    * GET /api/orders
@@ -30,10 +40,10 @@ export class OrderController {
       sortOrder: query.sortOrder,
     };
 
-    const filters = {
-      status: query.status,
-      paymentStatus: query.paymentStatus,
-      search: query.search,
+    const filters: any = {
+      status: query.status || undefined,
+      paymentStatus: query.paymentStatus || undefined,
+      search: query.search || undefined,
     };
 
     const result = await orderService.getAllOrders(pagination, filters);
@@ -125,10 +135,10 @@ export class OrderController {
       sortOrder: query.sortOrder,
     };
 
-    const filters = {
-      status: query.status,
-      paymentStatus: query.paymentStatus,
-      search: query.search,
+    const filters: any = {
+      status: query.status || undefined,
+      paymentStatus: query.paymentStatus || undefined,
+      search: query.search || undefined,
     };
 
     const result = await orderService.getUserOrders(userId, pagination, filters);

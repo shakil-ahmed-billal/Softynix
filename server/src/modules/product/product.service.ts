@@ -80,6 +80,17 @@ export class ProductService {
             description: true,
           },
         },
+        course: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            videoUrl: true,
+            thumbnail: true,
+            duration: true,
+            instructor: true,
+          },
+        },
       },
     });
 

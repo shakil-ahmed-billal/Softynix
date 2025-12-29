@@ -38,7 +38,7 @@ import { Input } from "@/components/ui/input";
 export default function AdminOrdersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [formStatus, setFormStatus] = useState<string>("pending");
@@ -48,7 +48,7 @@ export default function AdminOrdersPage() {
     page,
     limit: 10,
     search: search || undefined,
-    status: statusFilter || undefined,
+    status: statusFilter && statusFilter !== "all" ? statusFilter : undefined,
   });
 
   const { data: stats } = useAdminOrderStats();
@@ -163,7 +163,7 @@ export default function AdminOrdersPage() {
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Status</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="processing">Processing</SelectItem>
             <SelectItem value="shipped">Shipped</SelectItem>

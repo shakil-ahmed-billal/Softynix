@@ -2,19 +2,60 @@
 
 import { ToolCard } from "@/components/dashboard/ToolCard";
 import { EmptyState } from "@/components/dashboard/EmptyState";
-import { utilityTools } from "@/lib/dashboard-data";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useUserPurchases } from "@/hooks/useUserProductAccess";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function UtilityToolsPage() {
+  const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const userTools = utilityTools.filter((t) => t.categoryId === 6);
-  const filtered = userTools.filter((t) =>
-    t.toolName.toLowerCase().includes(searchQuery.toLowerCase())
+  const { data: purchases = [], isLoading } = useUserPurchases({
+    productType: "software_license",
+  });
+
+  if (!isAuthenticated) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">ইউটিলিটি টুলস</h1>
+          <p className="text-muted-foreground">
+            Please log in to view your utility tools
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Filter for utility tools
+  const utilityTools = purchases.filter((p) => 
+    p.product.category.name.toLowerCase().includes("utility") ||
+    p.product.category.name.toLowerCase().includes("tool") ||
+    p.productType === "software_license"
   );
 
-  if (userTools.length === 0) {
+  const filtered = utilityTools.filter((t) =>
+    t.product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">ইউটিলিটি টুলস</h1>
+          <p className="text-muted-foreground">
+            Download and manage your utility tools and software
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (utilityTools.length === 0) {
     return (
       <div className="space-y-6">
         <div>
@@ -56,8 +97,16 @@ export default function UtilityToolsPage() {
 
       {/* Tools Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((tool) => (
-          <ToolCard key={tool.id} tool={tool} />
+        {filtered.map((purchase) => (
+          <ToolCard
+            key={purchase.id}
+            tool={{
+              id: purchase.id,
+              toolName: purchase.product.name,
+              downloadLink: purchase.downloadUrl || "#",
+              categoryId: 6,
+            }}
+          />
         ))}
       </div>
     </div>

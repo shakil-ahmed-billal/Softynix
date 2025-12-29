@@ -2,19 +2,60 @@
 
 import { ToolCard } from "@/components/dashboard/ToolCard";
 import { EmptyState } from "@/components/dashboard/EmptyState";
-import { creativeTools } from "@/lib/dashboard-data";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useUserPurchases } from "@/hooks/useUserProductAccess";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function CreativeToolsPage() {
+  const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const userTools = creativeTools.filter((t) => t.categoryId === 3);
-  const filtered = userTools.filter((t) =>
-    t.toolName.toLowerCase().includes(searchQuery.toLowerCase())
+  const { data: purchases = [], isLoading } = useUserPurchases({
+    productType: "software_license", // Creative tools are typically software licenses
+  });
+
+  if (!isAuthenticated) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">ক্রিয়েটিভ টুলস</h1>
+          <p className="text-muted-foreground">
+            Please log in to view your creative tools
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Filter for creative tools (you may need to adjust this based on your category structure)
+  const creativeTools = purchases.filter((p) => 
+    p.product.category.name.toLowerCase().includes("creative") ||
+    p.product.category.name.toLowerCase().includes("design") ||
+    p.productType === "software_license"
   );
 
-  if (userTools.length === 0) {
+  const filtered = creativeTools.filter((t) =>
+    t.product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">ক্রিয়েটিভ টুলস</h1>
+          <p className="text-muted-foreground">
+            Download and manage your creative tools, presets, and resources
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (creativeTools.length === 0) {
     return (
       <div className="space-y-6">
         <div>
@@ -56,8 +97,16 @@ export default function CreativeToolsPage() {
 
       {/* Tools Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((tool) => (
-          <ToolCard key={tool.id} tool={tool} />
+        {filtered.map((purchase) => (
+          <ToolCard
+            key={purchase.id}
+            tool={{
+              id: purchase.id,
+              toolName: purchase.product.name,
+              downloadLink: purchase.downloadUrl || "#",
+              categoryId: 3,
+            }}
+          />
         ))}
       </div>
     </div>

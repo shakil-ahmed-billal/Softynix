@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { adminService } from './admin.service';
 import { sendSuccess } from '../../shared/apiResponse';
 import { asyncHandler } from '../../shared/errorHandler';
+import { adminService } from './admin.service';
 import {
   createAdminSchema,
-  updateAdminSchema,
-  getAdminsQuerySchema,
   getAdminParamsSchema,
+  getAdminsQuerySchema,
+  updateAdminSchema,
 } from './admin.validation';
 
 /**
@@ -84,6 +84,27 @@ export class AdminController {
   getDashboardStats = asyncHandler(async (req: Request, res: Response) => {
     const stats = await adminService.getDashboardStats();
     return sendSuccess(res, stats, 'Dashboard statistics retrieved successfully');
+  });
+
+  /**
+   * Get all users
+   * GET /api/admin/users
+   */
+  getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+    const query = getAdminsQuerySchema.parse(req.query);
+    
+    const pagination = {
+      page: query.page,
+      limit: query.limit,
+    };
+
+    const filters = {
+      status: query.status,
+      search: query.search,
+    };
+
+    const result = await adminService.getAllUsers(pagination, filters);
+    return sendSuccess(res, result, 'Users retrieved successfully');
   });
 }
 

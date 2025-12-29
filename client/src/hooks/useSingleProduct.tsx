@@ -22,6 +22,15 @@ interface Product {
     slug: string;
     description?: string;
   };
+  course?: {
+    id: string;
+    title: string;
+    description?: string;
+    videoUrl?: string;
+    thumbnail?: string;
+    duration?: string;
+    instructor?: string;
+  };
 }
 
 interface ProductResponse {

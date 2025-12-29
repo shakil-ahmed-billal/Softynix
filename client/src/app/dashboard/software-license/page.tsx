@@ -2,19 +2,51 @@
 
 import { LicenseCard } from "@/components/dashboard/LicenseCard";
 import { EmptyState } from "@/components/dashboard/EmptyState";
-import { softwareLicenses } from "@/lib/dashboard-data";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useSoftwareLicenses } from "@/hooks/useUserProductAccess";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function SoftwareLicensePage() {
+  const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const userLicenses = softwareLicenses.filter((l) => l.categoryId === 2);
-  const filtered = userLicenses.filter((l) =>
-    l.softwareName.toLowerCase().includes(searchQuery.toLowerCase())
+  const { data: licenses = [], isLoading } = useSoftwareLicenses();
+
+  if (!isAuthenticated) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">সফটওয়্যার লাইসেন্স</h1>
+          <p className="text-muted-foreground">
+            Please log in to view your software licenses
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const filtered = licenses.filter((l) =>
+    l.product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (userLicenses.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">সফটওয়্যার লাইসেন্স</h1>
+          <p className="text-muted-foreground">
+            Manage your software licenses and activation keys
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (licenses.length === 0) {
     return (
       <div className="space-y-6">
         <div>
@@ -57,7 +89,20 @@ export default function SoftwareLicensePage() {
       {/* Licenses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((license) => (
-          <LicenseCard key={license.id} license={license} />
+          <LicenseCard
+            key={license.id}
+            license={{
+              id: license.id,
+              softwareName: license.product.name,
+              version: "1.0",
+              licenseKey: license.licenseKey || "",
+              activationStatus: license.status === "active" ? "activated" : "not_activated",
+              deviceLimit: 1,
+              expiryDate: license.expiresAt || undefined,
+              downloadUrl: license.downloadUrl || undefined,
+              categoryId: 2,
+            }}
+          />
         ))}
       </div>
     </div>
