@@ -10,7 +10,7 @@ export const createOrderSchema = z.object({
   customerEmail: z.string().email('Invalid email address'),
   customerPhone: z.string().min(1, 'Phone number is required'),
   paymentMethod: z.enum(['Bkash', 'Nagad', 'Rocket', 'Upay'], {
-    errorMap: () => ({ message: 'Payment method must be Bkash, Nagad, Rocket, or Upay' }),
+    message: 'Payment method must be Bkash, Nagad, Rocket, or Upay',
   }),
   senderPhone: z.string().min(1, 'Sender phone number is required'),
   transactionId: z.string().min(1, 'Transaction ID is required'),

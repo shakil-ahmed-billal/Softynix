@@ -117,15 +117,15 @@ export class ProductCredentialsService {
   async upsertProductCredentials(data: {
     productId: string;
     productType: string;
-    email?: string;
-    password?: string;
-    licenseKey?: string;
-    accessUrl?: string;
-    downloadUrl?: string;
-    subscriptionStatus?: string;
-    expiresAt?: Date;
-    metadata?: string;
-    notes?: string;
+    email?: string | undefined;
+    password?: string | undefined;
+    licenseKey?: string | undefined;
+    accessUrl?: string | undefined;
+    downloadUrl?: string | undefined;
+    subscriptionStatus?: string | null | undefined;
+    expiresAt?: Date | undefined;
+    metadata?: string | undefined;
+    notes?: string | undefined;
   }): Promise<any> {
     // Verify product exists
     const product = await prisma.product.findUnique({
@@ -148,15 +148,15 @@ export class ProductCredentialsService {
         where: { productId: data.productId },
         data: {
           productType: data.productType,
-          email: data.email,
-          password: data.password,
-          licenseKey: data.licenseKey,
-          accessUrl: data.accessUrl,
-          downloadUrl: data.downloadUrl,
-          subscriptionStatus: data.subscriptionStatus,
-          expiresAt: data.expiresAt,
-          metadata: data.metadata,
-          notes: data.notes,
+          email: data.email ?? null,
+          password: data.password ?? null,
+          licenseKey: data.licenseKey ?? null,
+          accessUrl: data.accessUrl ?? null,
+          downloadUrl: data.downloadUrl ?? null,
+          subscriptionStatus: data.subscriptionStatus ?? null,
+          expiresAt: data.expiresAt ?? null,
+          metadata: data.metadata ?? null,
+          notes: data.notes ?? null,
         },
         include: {
           product: {
@@ -172,15 +172,15 @@ export class ProductCredentialsService {
         data: {
           productId: data.productId,
           productType: data.productType,
-          email: data.email,
-          password: data.password,
-          licenseKey: data.licenseKey,
-          accessUrl: data.accessUrl,
-          downloadUrl: data.downloadUrl,
-          subscriptionStatus: data.subscriptionStatus,
-          expiresAt: data.expiresAt,
-          metadata: data.metadata,
-          notes: data.notes,
+          email: data.email ?? null,
+          password: data.password ?? null,
+          licenseKey: data.licenseKey ?? null,
+          accessUrl: data.accessUrl ?? null,
+          downloadUrl: data.downloadUrl ?? null,
+          subscriptionStatus: data.subscriptionStatus ?? null,
+          expiresAt: data.expiresAt ?? null,
+          metadata: data.metadata ?? null,
+          notes: data.notes ?? null,
         },
         include: {
           product: {

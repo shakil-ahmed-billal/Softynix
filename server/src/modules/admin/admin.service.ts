@@ -139,11 +139,11 @@ export class AdminService {
   async updateAdmin(
     id: string,
     data: {
-      email?: string;
-      name?: string;
-      password?: string;
-      role?: string;
-      status?: string;
+      email?: string | undefined;
+      name?: string | undefined;
+      password?: string | undefined;
+      role?: string | undefined;
+      status?: string | undefined;
     }
   ): Promise<any> {
     // Check if admin exists
@@ -167,15 +167,21 @@ export class AdminService {
     }
 
     // Update admin
-    const updateData: any = {
-      ...(data.name && { name: data.name }),
-      ...(data.email && { email: data.email }),
-      ...(data.role && { role: data.role }),
-      ...(data.status && { status: data.status }),
-    };
+    const updateData: {
+      name?: string;
+      email?: string;
+      role?: string;
+      status?: string;
+      password?: string;
+    } = {};
+
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.email !== undefined) updateData.email = data.email;
+    if (data.role !== undefined) updateData.role = data.role;
+    if (data.status !== undefined) updateData.status = data.status;
 
     // Hash password if being updated
-    if (data.password) {
+    if (data.password !== undefined) {
       // TODO: Hash password in production
       updateData.password = data.password;
     }

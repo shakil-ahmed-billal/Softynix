@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { productService } from './product.service';
 import { sendSuccess, sendError } from '../../shared/apiResponse';
 import { asyncHandler } from '../../shared/errorHandler';
+import { removeUndefined } from '../../lib/utils';
 import {
   createProductSchema,
   updateProductSchema,
@@ -22,6 +23,7 @@ export class ProductController {
    */
   getAllProducts = asyncHandler(async (req: Request, res: Response) => {
     const query = getProductsQuerySchema.parse(req.query);
+    const rawQuery = req.query;
     
     const pagination = {
       page: query.page,
@@ -30,12 +32,13 @@ export class ProductController {
       sortOrder: query.sortOrder,
     };
 
-    const filters = {
-      status: query.status,
-      categoryId: query.categoryId,
-      featured: query.featured,
-      search: query.search,
-    };
+    const filters: { status?: string; categoryId?: string; featured?: boolean; search?: string } = {};
+    if (query.status !== undefined) filters.status = query.status;
+    if (rawQuery.categoryId && typeof rawQuery.categoryId === 'string' && rawQuery.categoryId !== '') {
+      filters.categoryId = rawQuery.categoryId;
+    }
+    if (query.featured !== undefined) filters.featured = query.featured;
+    if (query.search !== undefined) filters.search = query.search;
 
     const result = await productService.getAllProducts(pagination, filters);
     return sendSuccess(res, result, 'Products retrieved successfully');
@@ -69,7 +72,8 @@ export class ProductController {
    * POST /api/products
    */
   createProduct = asyncHandler(async (req: Request, res: Response) => {
-    const data = createProductSchema.parse(req.body);
+    const parsed = createProductSchema.parse(req.body);
+    const data = removeUndefined(parsed) as typeof parsed;
     const product = await productService.createProduct(data);
     return sendSuccess(res, product, 'Product created successfully', 201);
   });
@@ -80,7 +84,8 @@ export class ProductController {
    */
   updateProduct = asyncHandler(async (req: Request, res: Response) => {
     const { id } = getProductParamsSchema.parse(req.params);
-    const data = updateProductSchema.parse({ ...req.body, id });
+    const parsed = updateProductSchema.parse({ ...req.body, id });
+    const data = removeUndefined(parsed) as typeof parsed;
     const product = await productService.updateProduct(id, data);
     return sendSuccess(res, product, 'Product updated successfully');
   });

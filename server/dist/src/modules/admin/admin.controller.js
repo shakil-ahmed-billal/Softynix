@@ -1,0 +1,95 @@
+import { sendSuccess } from '../../shared/apiResponse';
+import { asyncHandler } from '../../shared/errorHandler';
+import { removeUndefined } from '../../lib/utils';
+import { adminService } from './admin.service';
+import { createAdminSchema, getAdminParamsSchema, getAdminsQuerySchema, updateAdminSchema, } from './admin.validation';
+/**
+ * Admin Controller
+ * Handles HTTP requests and responses
+ */
+export class AdminController {
+    /**
+     * Get all admins
+     * GET /api/admin/admins
+     */
+    getAllAdmins = asyncHandler(async (req, res) => {
+        const query = getAdminsQuerySchema.parse(req.query);
+        const pagination = {
+            page: query.page,
+            limit: query.limit,
+        };
+        const filters = {};
+        if (query.status !== undefined)
+            filters.status = query.status;
+        if (query.search !== undefined)
+            filters.search = query.search;
+        const result = await adminService.getAllAdmins(pagination, filters);
+        return sendSuccess(res, result, 'Admins retrieved successfully');
+    });
+    /**
+     * Get single admin by ID
+     * GET /api/admin/admins/:id
+     */
+    getAdminById = asyncHandler(async (req, res) => {
+        const { id } = getAdminParamsSchema.parse(req.params);
+        const admin = await adminService.getAdminById(id);
+        return sendSuccess(res, admin, 'Admin retrieved successfully');
+    });
+    /**
+     * Create new admin
+     * POST /api/admin/admins
+     */
+    createAdmin = asyncHandler(async (req, res) => {
+        const data = createAdminSchema.parse(req.body);
+        const admin = await adminService.createAdmin(data);
+        return sendSuccess(res, admin, 'Admin created successfully', 201);
+    });
+    /**
+     * Update admin
+     * PUT /api/admin/admins/:id
+     */
+    updateAdmin = asyncHandler(async (req, res) => {
+        const { id } = getAdminParamsSchema.parse(req.params);
+        const parsed = updateAdminSchema.parse({ ...req.body, id });
+        const data = removeUndefined(parsed);
+        const admin = await adminService.updateAdmin(id, data);
+        return sendSuccess(res, admin, 'Admin updated successfully');
+    });
+    /**
+     * Delete admin
+     * DELETE /api/admin/admins/:id
+     */
+    deleteAdmin = asyncHandler(async (req, res) => {
+        const { id } = getAdminParamsSchema.parse(req.params);
+        await adminService.deleteAdmin(id);
+        return sendSuccess(res, null, 'Admin deleted successfully');
+    });
+    /**
+     * Get dashboard statistics
+     * GET /api/admin/dashboard/stats
+     */
+    getDashboardStats = asyncHandler(async (req, res) => {
+        const stats = await adminService.getDashboardStats();
+        return sendSuccess(res, stats, 'Dashboard statistics retrieved successfully');
+    });
+    /**
+     * Get all users
+     * GET /api/admin/users
+     */
+    getAllUsers = asyncHandler(async (req, res) => {
+        const query = getAdminsQuerySchema.parse(req.query);
+        const pagination = {
+            page: query.page,
+            limit: query.limit,
+        };
+        const filters = {};
+        if (query.status !== undefined)
+            filters.status = query.status;
+        if (query.search !== undefined)
+            filters.search = query.search;
+        const result = await adminService.getAllUsers(pagination, filters);
+        return sendSuccess(res, result, 'Users retrieved successfully');
+    });
+}
+export const adminController = new AdminController();
+//# sourceMappingURL=admin.controller.js.map

@@ -80,17 +80,6 @@ export class ProductService {
             description: true,
           },
         },
-        course: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            videoUrl: true,
-            thumbnail: true,
-            duration: true,
-            instructor: true,
-          },
-        },
       },
     });
 
@@ -132,14 +121,14 @@ export class ProductService {
   async createProduct(data: {
     name: string;
     slug: string;
-    description?: string;
+    description?: string | null | undefined;
     price: number;
-    image?: string;
-    images?: string[];
+    image?: string | null | undefined;
+    images?: string[] | undefined;
     categoryId: string;
-    status?: string;
-    stock?: number;
-    featured?: boolean;
+    status?: string | undefined;
+    stock?: number | undefined;
+    featured?: boolean | undefined;
   }): Promise<any> {
     // Check if slug already exists
     const existingProduct = await prisma.product.findUnique({
@@ -164,9 +153,9 @@ export class ProductService {
       data: {
         name: data.name,
         slug: data.slug,
-        description: data.description,
+        description: data.description ?? null,
         price: data.price,
-        image: data.image || null,
+        image: data.image ?? null,
         images: data.images || [],
         categoryId: data.categoryId,
         status: data.status || 'active',
@@ -193,16 +182,16 @@ export class ProductService {
   async updateProduct(
     id: string,
     data: {
-      name?: string;
-      slug?: string;
-      description?: string;
-      price?: number;
-      image?: string;
-      images?: string[];
-        categoryId?: string;
-      status?: string;
-      stock?: number;
-      featured?: boolean;
+      name?: string | undefined;
+      slug?: string | undefined;
+      description?: string | null | undefined;
+      price?: number | undefined;
+      image?: string | null | undefined;
+      images?: string[] | undefined;
+      categoryId?: string | undefined;
+      status?: string | undefined;
+      stock?: number | undefined;
+      featured?: boolean | undefined;
     }
   ): Promise<any> {
     // Check if product exists
@@ -237,20 +226,33 @@ export class ProductService {
     }
 
     // Update product
+    const updateData: {
+      name?: string;
+      slug?: string;
+      description?: string | null;
+      price?: number;
+      image?: string | null;
+      images?: string[];
+      categoryId?: string;
+      status?: string;
+      stock?: number;
+      featured?: boolean;
+    } = {};
+    
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.description !== undefined) updateData.description = data.description ?? null;
+    if (data.price !== undefined) updateData.price = data.price;
+    if (data.image !== undefined) updateData.image = data.image ?? null;
+    if (data.images !== undefined) updateData.images = data.images;
+    if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.stock !== undefined) updateData.stock = data.stock;
+    if (data.featured !== undefined) updateData.featured = data.featured;
+
     const product = await prisma.product.update({
       where: { id },
-      data: {
-        ...(data.name && { name: data.name }),
-        ...(data.slug && { slug: data.slug }),
-        ...(data.description !== undefined && { description: data.description }),
-        ...(data.price && { price: data.price }),
-        ...(data.image !== undefined && { image: data.image || null }),
-        ...(data.images !== undefined && { images: data.images }),
-        ...(data.categoryId && { categoryId: data.categoryId }),
-        ...(data.status && { status: data.status }),
-        ...(data.stock !== undefined && { stock: data.stock }),
-        ...(data.featured !== undefined && { featured: data.featured }),
-      },
+      data: updateData,
       include: {
         category: {
           select: {

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { productCredentialsService } from './product-credentials.service';
 import { sendSuccess } from '../../shared/apiResponse';
 import { asyncHandler } from '../../shared/errorHandler';
+import { removeUndefined } from '../../lib/utils';
 import {
   upsertProductCredentialsSchema,
   getProductCredentialsQuerySchema,
@@ -29,11 +30,10 @@ export class ProductCredentialsController {
       sortOrder: query.sortOrder,
     };
 
-    const filters = {
-      productId: query.productId,
-      productType: query.productType,
-      search: query.search,
-    };
+    const filters: { productId?: string; productType?: string; search?: string } = {};
+    if (query.productId !== undefined) filters.productId = query.productId;
+    if (query.productType !== undefined) filters.productType = query.productType;
+    if (query.search !== undefined) filters.search = query.search;
 
     const result = await productCredentialsService.getAllProductCredentials(pagination, filters);
     return sendSuccess(res, result, 'Product credentials retrieved successfully');
@@ -89,7 +89,7 @@ export class ProductCredentialsController {
       }
     }
     
-    const credentialsData = {
+    const credentialsDataRaw: any = {
       ...data,
       expiresAt: expiresAtDate,
       email: data.email && data.email !== '' ? data.email : undefined,
@@ -98,6 +98,7 @@ export class ProductCredentialsController {
       accessUrl: data.accessUrl && data.accessUrl !== '' ? data.accessUrl : undefined,
       downloadUrl: data.downloadUrl && data.downloadUrl !== '' ? data.downloadUrl : undefined,
     };
+    const credentialsData = removeUndefined(credentialsDataRaw) as any;
 
     const credentials = await productCredentialsService.upsertProductCredentials(credentialsData);
     return sendSuccess(res, credentials, 'Product credentials saved successfully', 201);

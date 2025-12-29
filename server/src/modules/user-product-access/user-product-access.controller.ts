@@ -25,7 +25,10 @@ export class UserProductAccessController {
     const search = req.query.search as string | undefined;
 
     const pagination = { page, limit, sortBy, sortOrder };
-    const filters = { productType, status, search };
+    const filters: { productType?: string; status?: string; search?: string } = {};
+    if (productType !== undefined) filters.productType = productType;
+    if (status !== undefined) filters.status = status;
+    if (search !== undefined) filters.search = search;
 
     const result = await userProductAccessService.getUserPurchases(userId, pagination, filters);
     return sendSuccess(res, result, 'Purchases retrieved successfully');
@@ -108,6 +111,10 @@ export class UserProductAccessController {
       throw new Error('User not authenticated');
     }
 
+    if (!id) {
+      throw new Error('Product access ID is required');
+    }
+
     const access = await userProductAccessService.getProductAccessById(id, userId);
     return sendSuccess(res, access, 'Product access retrieved successfully');
   });
@@ -124,6 +131,10 @@ export class UserProductAccessController {
 
     if (!userId) {
       throw new Error('User not authenticated');
+    }
+
+    if (!id) {
+      throw new Error('Product access ID is required');
     }
 
     if (typeof progress !== 'number') {
@@ -147,6 +158,10 @@ export class UserProductAccessController {
       throw new Error('User not authenticated');
     }
 
+    if (!id) {
+      throw new Error('Product access ID is required');
+    }
+
     const completions = await userProductAccessService.getLessonCompletions(id, userId);
     return sendSuccess(res, completions, 'Lesson completions retrieved successfully');
   });
@@ -163,6 +178,10 @@ export class UserProductAccessController {
 
     if (!userId) {
       throw new Error('User not authenticated');
+    }
+
+    if (!id) {
+      throw new Error('Product access ID is required');
     }
 
     if (typeof milestoneId !== 'number' || typeof moduleId !== 'number') {
@@ -185,6 +204,10 @@ export class UserProductAccessController {
 
     if (!userId) {
       throw new Error('User not authenticated');
+    }
+
+    if (!id) {
+      throw new Error('Product access ID is required');
     }
 
     if (typeof milestoneId !== 'number' || typeof moduleId !== 'number') {

@@ -24,5 +24,9 @@ export interface FilterParams {
   categoryId?: string;
   featured?: boolean;
   search?: string;
+  paymentStatus?: string;
+  productId?: string;
+  productType?: string;
+  userId?: string;
 }
 

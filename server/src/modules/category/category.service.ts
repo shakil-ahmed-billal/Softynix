@@ -111,9 +111,9 @@ export class CategoryService {
   async createCategory(data: {
     name: string;
     slug: string;
-    description?: string;
-    image?: string;
-    status?: string;
+    description?: string | null | undefined;
+    image?: string | null | undefined;
+    status?: string | undefined;
   }): Promise<any> {
     // Check if slug already exists
     const existingCategory = await prisma.category.findUnique({
@@ -129,8 +129,8 @@ export class CategoryService {
       data: {
         name: data.name,
         slug: data.slug,
-        description: data.description,
-        image: data.image || null,
+        description: data.description ?? null,
+        image: data.image ?? null,
         status: data.status || 'active',
       },
       include: {
@@ -151,11 +151,11 @@ export class CategoryService {
   async updateCategory(
     id: string,
     data: {
-      name?: string;
-      slug?: string;
-      description?: string;
-      image?: string;
-      status?: string;
+      name?: string | undefined;
+      slug?: string | undefined;
+      description?: string | null | undefined;
+      image?: string | null | undefined;
+      status?: string | undefined;
     }
   ): Promise<any> {
     // Check if category exists
@@ -179,15 +179,23 @@ export class CategoryService {
     }
 
     // Update category
+    const updateData: {
+      name?: string;
+      slug?: string;
+      description?: string | null;
+      image?: string | null;
+      status?: string;
+    } = {};
+    
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.description !== undefined) updateData.description = data.description ?? null;
+    if (data.image !== undefined) updateData.image = data.image ?? null;
+    if (data.status !== undefined) updateData.status = data.status;
+
     const category = await prisma.category.update({
       where: { id },
-      data: {
-        ...(data.name && { name: data.name }),
-        ...(data.slug && { slug: data.slug }),
-        ...(data.description !== undefined && { description: data.description }),
-        ...(data.image !== undefined && { image: data.image || null }),
-        ...(data.status && { status: data.status }),
-      },
+      data: updateData,
       include: {
         _count: {
           select: {

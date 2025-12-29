@@ -178,9 +178,9 @@ export class ReviewService {
   async createReview(data: {
     userId: string;
     productId: string;
-    orderId?: string;
+    orderId?: string | null | undefined;
     rating: number;
-    comment?: string;
+    comment?: string | null | undefined;
   }): Promise<any> {
     // Verify user has purchased this product
     const hasAccess = await prisma.userProductAccess.findFirst({
@@ -228,9 +228,9 @@ export class ReviewService {
       data: {
         userId: data.userId,
         productId: data.productId,
-        orderId: data.orderId,
+        orderId: data.orderId ?? null,
         rating: data.rating,
-        comment: data.comment,
+        comment: data.comment ?? null,
         status: 'pending', // Admin must approve
       },
       include: {
@@ -261,8 +261,8 @@ export class ReviewService {
     id: string,
     userId: string,
     data: {
-      rating?: number;
-      comment?: string;
+      rating?: number | undefined;
+      comment?: string | null | undefined;
     }
   ): Promise<any> {
     // Check if review exists and belongs to user
@@ -279,12 +279,17 @@ export class ReviewService {
     }
 
     // Update review
+    const updateData: {
+      rating?: number;
+      comment?: string | null;
+    } = {};
+    
+    if (data.rating !== undefined) updateData.rating = data.rating;
+    if (data.comment !== undefined) updateData.comment = data.comment ?? null;
+
     const review = await prisma.review.update({
       where: { id },
-      data: {
-        ...(data.rating && { rating: data.rating }),
-        ...(data.comment !== undefined && { comment: data.comment }),
-      },
+      data: updateData,
       include: {
         user: {
           select: {

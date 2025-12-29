@@ -15,21 +15,9 @@ if (!connectionString) {
 // For Prisma Studio to work, ensure DATABASE_URL in .env is properly formatted
 let prisma: PrismaClient;
 
-try {
-  // Use PrismaPg adapter for server runtime (better for serverless/edge)
-  // This doesn't affect Prisma Studio which connects directly via schema.prisma
-  const adapter = new PrismaPg({ connectionString });
-  prisma = new PrismaClient({ adapter });
-} catch (error) {
-  // Fallback to direct connection if adapter initialization fails
-  console.warn('PrismaPg adapter initialization failed, using direct connection');
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: connectionString,
-      },
-    },
-  });
-}
+// Use PrismaPg adapter for server runtime (better for serverless/edge)
+// This doesn't affect Prisma Studio which connects directly via schema.prisma
+const adapter = new PrismaPg({ connectionString });
+prisma = new PrismaClient({ adapter });
 
 export { prisma };
