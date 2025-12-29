@@ -31,7 +31,7 @@ export class AuthService {
     name: string;
     email: string;
     password: string;
-    phone?: string;
+    phone?: string | undefined;
   }): Promise<{ user: any; token: string }> {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -51,7 +51,7 @@ export class AuthService {
         name: data.name,
         email: data.email,
         password: hashedPassword,
-        phone: data.phone,
+        phone: data.phone ?? null,
         status: 'active',
         emailVerified: false,
       },
@@ -199,9 +199,9 @@ export class AuthService {
   async updateProfile(
     userId: string,
     data: {
-      name?: string;
-      phone?: string;
-      avatar?: string;
+      name?: string | undefined;
+      phone?: string | undefined;
+      avatar?: string | undefined;
     }
   ): Promise<any> {
     const user = await prisma.user.findUnique({
@@ -212,13 +212,25 @@ export class AuthService {
       throw new AppError('User not found', 404);
     }
 
+    const updateData: {
+      name?: string;
+      phone?: string | null;
+      avatar?: string | null;
+    } = {};
+    
+    if (data.name !== undefined) {
+      updateData.name = data.name;
+    }
+    if (data.phone !== undefined) {
+      updateData.phone = data.phone || null;
+    }
+    if (data.avatar !== undefined) {
+      updateData.avatar = data.avatar || null;
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: {
-        ...(data.name && { name: data.name }),
-        ...(data.phone !== undefined && { phone: data.phone }),
-        ...(data.avatar !== undefined && { avatar: data.avatar || null }),
-      },
+      data: updateData,
       select: {
         id: true,
         email: true,

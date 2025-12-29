@@ -20,7 +20,7 @@ export interface TokenPayload {
 export const generateToken = (payload: TokenPayload): string => {
   return jwt.sign(payload, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
-  });
+  } as jwt.SignOptions);
 };
 
 /**
@@ -46,6 +46,6 @@ export const extractToken = (authHeader?: string): string | null => {
     return null;
   }
   
-  return parts[1];
+  return parts[1] ?? null;
 };
 

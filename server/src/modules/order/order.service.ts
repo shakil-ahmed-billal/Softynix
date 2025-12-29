@@ -562,14 +562,21 @@ export class OrderService {
     }
 
     // Update order
+    const updateData: {
+      status?: string;
+      paymentStatus?: string;
+      shippingAddress?: string | null;
+      notes?: string | null;
+    } = {};
+    
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.paymentStatus !== undefined) updateData.paymentStatus = data.paymentStatus;
+    if (data.shippingAddress !== undefined) updateData.shippingAddress = data.shippingAddress || null;
+    if (data.notes !== undefined) updateData.notes = data.notes || null;
+
     const order = await prisma.order.update({
       where: { id },
-      data: {
-        ...(data.status && { status: data.status }),
-        ...(data.paymentStatus && { paymentStatus: data.paymentStatus }),
-        ...(data.shippingAddress !== undefined && { shippingAddress: data.shippingAddress }),
-        ...(data.notes !== undefined && { notes: data.notes }),
-      },
+      data: updateData,
       include: {
         items: {
           include: {

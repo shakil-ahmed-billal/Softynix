@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { categoryService } from './category.service';
 import { sendSuccess } from '../../shared/apiResponse';
 import { asyncHandler } from '../../shared/errorHandler';
+import { removeUndefined } from '../../lib/utils';
 import {
   createCategorySchema,
   updateCategorySchema,
@@ -30,10 +31,9 @@ export class CategoryController {
       sortOrder: query.sortOrder,
     };
 
-    const filters = {
-      status: query.status,
-      search: query.search,
-    };
+    const filters: { status?: string; search?: string } = {};
+    if (query.status !== undefined) filters.status = query.status;
+    if (query.search !== undefined) filters.search = query.search;
 
     const result = await categoryService.getAllCategories(pagination, filters);
     return sendSuccess(res, result, 'Categories retrieved successfully');
@@ -76,7 +76,8 @@ export class CategoryController {
    * POST /api/categories
    */
   createCategory = asyncHandler(async (req: Request, res: Response) => {
-    const data = createCategorySchema.parse(req.body);
+    const parsed = createCategorySchema.parse(req.body);
+    const data = removeUndefined(parsed) as typeof parsed;
     const category = await categoryService.createCategory(data);
     return sendSuccess(res, category, 'Category created successfully', 201);
   });
@@ -87,7 +88,8 @@ export class CategoryController {
    */
   updateCategory = asyncHandler(async (req: Request, res: Response) => {
     const { id } = getCategoryParamsSchema.parse(req.params);
-    const data = updateCategorySchema.parse({ ...req.body, id });
+    const parsed = updateCategorySchema.parse({ ...req.body, id });
+    const data = removeUndefined(parsed) as typeof parsed;
     const category = await categoryService.updateCategory(id, data);
     return sendSuccess(res, category, 'Category updated successfully');
   });

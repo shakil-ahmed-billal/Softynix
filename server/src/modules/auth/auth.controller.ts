@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { authService } from './auth.service';
 import { sendSuccess } from '../../shared/apiResponse';
 import { asyncHandler } from '../../shared/errorHandler';
+import { removeUndefined } from '../../lib/utils';
 import {
   signupSchema,
   loginSchema,
@@ -20,7 +21,8 @@ export class AuthController {
    * POST /api/auth/signup
    */
   signup = asyncHandler(async (req: Request, res: Response) => {
-    const data = signupSchema.parse(req.body);
+    const parsed = signupSchema.parse(req.body);
+    const data = removeUndefined(parsed) as typeof parsed;
     const result = await authService.signup(data);
     return sendSuccess(res, result, 'User registered successfully', 201);
   });
@@ -57,7 +59,8 @@ export class AuthController {
     if (!userId) {
       return sendSuccess(res, null, 'User not authenticated', 401);
     }
-    const data = updateProfileSchema.parse(req.body);
+    const parsed = updateProfileSchema.parse(req.body);
+    const data = removeUndefined(parsed) as typeof parsed;
     const user = await authService.updateProfile(userId, data);
     return sendSuccess(res, user, 'Profile updated successfully');
   });

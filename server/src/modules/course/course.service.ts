@@ -118,16 +118,16 @@ export class CourseService {
   async createCourse(data: {
     productId: string;
     title: string;
-    description?: string;
-    instructor?: string;
-    duration?: string;
-    level?: string;
-    language?: string;
-    thumbnail?: string;
-    videoUrl?: string;
-    resources?: string[];
-    modules?: string; // JSON string
-    status?: string;
+    description?: string | null | undefined;
+    instructor?: string | null | undefined;
+    duration?: string | null | undefined;
+    level?: string | null | undefined;
+    language?: string | undefined;
+    thumbnail?: string | null | undefined;
+    videoUrl?: string | null | undefined;
+    resources?: string[] | undefined;
+    modules?: string | null | undefined;
+    status?: string | undefined;
   }): Promise<any> {
     // Verify product exists
     const product = await prisma.product.findUnique({
@@ -161,15 +161,15 @@ export class CourseService {
       data: {
         productId: data.productId,
         title: data.title,
-        description: data.description,
-        instructor: data.instructor,
-        duration: data.duration,
-        level: data.level,
+        description: data.description ?? null,
+        instructor: data.instructor ?? null,
+        duration: data.duration ?? null,
+        level: data.level ?? null,
         language: data.language || 'en',
-        thumbnail: data.thumbnail,
-        videoUrl: data.videoUrl,
+        thumbnail: data.thumbnail ?? null,
+        videoUrl: data.videoUrl ?? null,
         resources: data.resources || [],
-        modules: data.modules,
+        modules: data.modules ?? null,
         status: data.status || 'active',
       },
       include: {
@@ -190,17 +190,17 @@ export class CourseService {
   async updateCourse(
     id: string,
     data: {
-      title?: string;
-      description?: string;
-      instructor?: string;
-      duration?: string;
-      level?: string;
-      language?: string;
-      thumbnail?: string;
-      videoUrl?: string;
-      resources?: string[];
-      modules?: string; // JSON string
-      status?: string;
+      title?: string | undefined;
+      description?: string | null | undefined;
+      instructor?: string | null | undefined;
+      duration?: string | null | undefined;
+      level?: string | null | undefined;
+      language?: string | undefined;
+      thumbnail?: string | null | undefined;
+      videoUrl?: string | null | undefined;
+      resources?: string[] | undefined;
+      modules?: string | null | undefined;
+      status?: string | undefined;
     }
   ): Promise<any> {
     // Check if course exists
@@ -222,21 +222,37 @@ export class CourseService {
     }
 
     // Update course
+    const updateData: {
+      title?: string;
+      description?: string | null;
+      instructor?: string | null;
+      duration?: string | null;
+      level?: string | null;
+      language?: string;
+      thumbnail?: string | null;
+      videoUrl?: string | null;
+      resources?: string[];
+      modules?: string | null;
+      status?: string;
+      productId?: string;
+    } = {};
+    
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.description !== undefined) updateData.description = data.description ?? null;
+    if (data.instructor !== undefined) updateData.instructor = data.instructor ?? null;
+    if (data.duration !== undefined) updateData.duration = data.duration ?? null;
+    if (data.level !== undefined) updateData.level = data.level ?? null;
+    if (data.language !== undefined) updateData.language = data.language;
+    if (data.thumbnail !== undefined) updateData.thumbnail = data.thumbnail ?? null;
+    if (data.videoUrl !== undefined) updateData.videoUrl = data.videoUrl ?? null;
+    if (data.resources !== undefined) updateData.resources = data.resources;
+    if (data.modules !== undefined) updateData.modules = data.modules ?? null;
+    if (data.status !== undefined) updateData.status = data.status;
+    // Note: productId update is not supported in update method
+
     const course = await prisma.course.update({
       where: { id },
-      data: {
-        ...(data.title && { title: data.title }),
-        ...(data.description !== undefined && { description: data.description }),
-        ...(data.instructor !== undefined && { instructor: data.instructor }),
-        ...(data.duration !== undefined && { duration: data.duration }),
-        ...(data.level !== undefined && { level: data.level }),
-        ...(data.language !== undefined && { language: data.language }),
-        ...(data.thumbnail !== undefined && { thumbnail: data.thumbnail }),
-        ...(data.videoUrl !== undefined && { videoUrl: data.videoUrl }),
-        ...(data.resources !== undefined && { resources: data.resources }),
-        ...(data.modules !== undefined && { modules: data.modules }),
-        ...(data.status && { status: data.status }),
-      },
+      data: updateData,
       include: {
         product: {
           include: {

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { reviewService } from './review.service';
 import { sendSuccess, sendError } from '../../shared/apiResponse';
 import { asyncHandler } from '../../shared/errorHandler';
+import { removeUndefined } from '../../lib/utils';
 import {
   createReviewSchema,
   updateReviewSchema,
@@ -31,12 +32,11 @@ export class ReviewController {
       sortOrder: query.sortOrder,
     };
 
-    const filters = {
-      status: query.status,
-      productId: query.productId,
-      userId: query.userId,
-      search: query.search,
-    };
+    const filters: { status?: string; productId?: string; userId?: string; search?: string } = {};
+    if (query.status !== undefined) filters.status = query.status;
+    if (query.productId !== undefined) filters.productId = query.productId;
+    if (query.userId !== undefined) filters.userId = query.userId;
+    if (query.search !== undefined) filters.search = query.search;
 
     const result = await reviewService.getAllReviews(pagination, filters);
     return sendSuccess(res, result, 'Reviews retrieved successfully');
@@ -110,9 +110,10 @@ export class ReviewController {
     if (!userId) {
       return sendError(res, 'User not authenticated', null, 401);
     }
-    const data = createReviewSchema.parse(req.body);
+    const parsed = createReviewSchema.parse(req.body);
+    const cleanData = removeUndefined(parsed) as typeof parsed;
     const review = await reviewService.createReview({
-      ...data,
+      ...cleanData,
       userId: userId,
     });
     return sendSuccess(res, review, 'Review created successfully', 201);
@@ -128,7 +129,8 @@ export class ReviewController {
       return sendError(res, 'User not authenticated', null, 401);
     }
     const { id } = getReviewParamsSchema.parse(req.params);
-    const data = updateReviewSchema.parse(req.body);
+    const parsed = updateReviewSchema.parse(req.body);
+    const data = removeUndefined(parsed) as typeof parsed;
     const review = await reviewService.updateReview(id, userId, data);
     return sendSuccess(res, review, 'Review updated successfully');
   });

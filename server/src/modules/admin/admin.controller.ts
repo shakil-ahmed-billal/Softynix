@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { sendSuccess } from '../../shared/apiResponse';
 import { asyncHandler } from '../../shared/errorHandler';
+import { removeUndefined } from '../../lib/utils';
 import { adminService } from './admin.service';
 import {
   createAdminSchema,
@@ -27,10 +28,9 @@ export class AdminController {
       limit: query.limit,
     };
 
-    const filters = {
-      status: query.status,
-      search: query.search,
-    };
+    const filters: { status?: string; search?: string } = {};
+    if (query.status !== undefined) filters.status = query.status;
+    if (query.search !== undefined) filters.search = query.search;
 
     const result = await adminService.getAllAdmins(pagination, filters);
     return sendSuccess(res, result, 'Admins retrieved successfully');
@@ -62,7 +62,8 @@ export class AdminController {
    */
   updateAdmin = asyncHandler(async (req: Request, res: Response) => {
     const { id } = getAdminParamsSchema.parse(req.params);
-    const data = updateAdminSchema.parse({ ...req.body, id });
+    const parsed = updateAdminSchema.parse({ ...req.body, id });
+    const data = removeUndefined(parsed) as typeof parsed;
     const admin = await adminService.updateAdmin(id, data);
     return sendSuccess(res, admin, 'Admin updated successfully');
   });
@@ -98,10 +99,9 @@ export class AdminController {
       limit: query.limit,
     };
 
-    const filters = {
-      status: query.status,
-      search: query.search,
-    };
+    const filters: { status?: string; search?: string } = {};
+    if (query.status !== undefined) filters.status = query.status;
+    if (query.search !== undefined) filters.search = query.search;
 
     const result = await adminService.getAllUsers(pagination, filters);
     return sendSuccess(res, result, 'Users retrieved successfully');

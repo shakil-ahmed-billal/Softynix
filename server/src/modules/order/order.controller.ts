@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { sendSuccess } from '../../shared/apiResponse';
 import { asyncHandler } from '../../shared/errorHandler';
+import { removeUndefined } from '../../lib/utils';
 import { orderService } from './order.service';
 import {
   createOrderSchema,
@@ -93,7 +94,8 @@ export class OrderController {
    */
   updateOrder = asyncHandler(async (req: Request, res: Response) => {
     const { id } = getOrderParamsSchema.parse(req.params);
-    const data = updateOrderSchema.parse(req.body);
+    const parsed = updateOrderSchema.parse(req.body);
+    const data = removeUndefined(parsed) as any;
     const order = await orderService.updateOrder(id, data);
     return sendSuccess(res, order, 'Order updated successfully');
   });
