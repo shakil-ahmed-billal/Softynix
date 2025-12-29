@@ -25,7 +25,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://notice-management-ten.vercel.app",
+      "https://softynix-emn3.vercel.app",
     ],
     credentials: true,
   })
@@ -71,6 +71,7 @@ app.use((req, res) => {
         "POST_verify-email": "/api/auth/verify-email",
         "POST_verify-email-otp": "/api/auth/verify-email-otp",
         "POST_verify-email-otp-resend": "/api/auth/verify-email-otp-resend",
+        
     }
   });
 });
