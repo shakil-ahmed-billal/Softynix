@@ -3,13 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Star, Plus, Minus, Trash2 } from "lucide-react";
-import { CartItem } from "@/contexts/cart-context";
+import { CartItem } from "@/types/product";
 import { Badge } from "@/components/ui/badge";
 
 interface CartItemCardProps {
   item: CartItem;
-  onUpdateQuantity: (productId: number, quantity: number) => void;
-  onRemove: (productId: number) => void;
+  onUpdateQuantity: (productId: string | number, quantity: number) => void;
+  onRemove: (productId: string | number) => void;
 }
 
 export function CartItemCard({

@@ -103,7 +103,10 @@ export default function CreativeToolsPage() {
             tool={{
               id: purchase.id,
               toolName: purchase.product.name,
-              downloadLink: purchase.downloadUrl || "#",
+              downloadUrl: purchase.downloadUrl || "#",
+              licenseType: purchase.product.category?.name || "Standard",
+              fileSize: "N/A",
+              lastUpdate: new Date().toISOString(),
               categoryId: 3,
             }}
           />

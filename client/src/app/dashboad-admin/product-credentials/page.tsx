@@ -103,7 +103,7 @@ export default function AdminProductCredentialsPage() {
       licenseKey: (formData.get("licenseKey") as string)?.trim() || undefined,
       accessUrl: (formData.get("accessUrl") as string)?.trim() || undefined,
       downloadUrl: (formData.get("downloadUrl") as string)?.trim() || undefined,
-      subscriptionStatus: (formData.get("subscriptionStatus") as string) || undefined,
+      subscriptionStatus: ((formData.get("subscriptionStatus") as string) || undefined) as "active" | "expired" | "cancelled" | undefined,
       expiresAt: (formData.get("expiresAt") as string) || undefined,
       metadata: (formData.get("metadata") as string)?.trim() || undefined,
       notes: (formData.get("notes") as string)?.trim() || undefined,

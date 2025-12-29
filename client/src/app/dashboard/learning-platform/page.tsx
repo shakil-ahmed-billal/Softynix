@@ -94,10 +94,14 @@ export default function LearningPlatformPage() {
           
           // Parse course modules to get total lessons
           let totalLessons = 0;
-          if (courseData?.modules) {
+          const courseModules = (courseData as any)?.modules;
+          if (courseModules) {
             try {
-              const modules = JSON.parse(courseData.modules);
-              totalLessons = modules.milestones?.reduce(
+              const modules = typeof courseModules === 'string' ? JSON.parse(courseModules) : courseModules;
+              totalLessons = modules?.course?.milestones?.reduce(
+                (sum: number, milestone: any) => sum + (milestone.modules?.length || 0),
+                0
+              ) || modules?.milestones?.reduce(
                 (sum: number, milestone: any) => sum + (milestone.modules?.length || 0),
                 0
               ) || 0;
@@ -116,8 +120,11 @@ export default function LearningPlatformPage() {
                   courseTitle: course.product.name,
                   completedLessons,
                   totalLessons,
-                  certificateStatus: progress === 100 ? "available" : "not_available",
+                  certificateStatus: progress === 100 ? "available" : "not-available",
                   categoryId: 5,
+                  thumbnail: course.product.image || (courseData as any)?.thumbnail || "",
+                  progress: progress,
+                  modules: [], // Course modules are handled separately in the course player
                 }}
               />
             </div>

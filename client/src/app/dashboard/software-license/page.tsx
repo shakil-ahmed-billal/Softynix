@@ -96,7 +96,7 @@ export default function SoftwareLicensePage() {
               softwareName: license.product.name,
               version: "1.0",
               licenseKey: license.licenseKey || "",
-              activationStatus: license.status === "active" ? "activated" : "not_activated",
+              activationStatus: license.status === "active" ? "activated" : "pending",
               deviceLimit: 1,
               expiryDate: license.expiresAt || undefined,
               downloadUrl: license.downloadUrl || undefined,
