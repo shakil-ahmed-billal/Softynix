@@ -63,7 +63,7 @@ export default function AdminCoursesPage() {
   const [search, setSearch] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<any>(null);
-  const [formStatus, setFormStatus] = useState<string>("active");
+  const [formStatus, setFormStatus] = useState<"active" | "inactive">("active");
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [milestones, setMilestones] = useState<Milestone[]>([]);
 
@@ -411,7 +411,7 @@ export default function AdminCoursesPage() {
 
               <div>
                 <Label htmlFor="status">Status</Label>
-                <Select value={formStatus} onValueChange={setFormStatus}>
+                <Select value={formStatus} onValueChange={(value) => setFormStatus(value as "active" | "inactive")}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>

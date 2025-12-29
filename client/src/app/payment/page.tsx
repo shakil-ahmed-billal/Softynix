@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/contexts/cart-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CreditCard, CheckCircle2, ArrowLeft, Wallet } from "lucide-react";
+import { CreditCard, CheckCircle2, ArrowLeft, Wallet, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 
@@ -30,7 +30,7 @@ const PAYMENT_METHODS = [
 
 const PAYMENT_ACCOUNT = "01966254437";
 
-export default function PaymentPage() {
+function PaymentPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { cartItems, getTotalPrice, clearCart } = useCart();
@@ -291,7 +291,7 @@ export default function PaymentPage() {
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
                     <span>
-                      {item.title || item.name} × {item.quantity}
+                      {item.title} × {item.quantity}
                     </span>
                     <span className="font-medium">
                       {item.priceValue
@@ -345,6 +345,29 @@ export default function PaymentPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-4xl mx-auto">
+            <Card>
+              <CardContent className="pt-12 pb-12">
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Loading payment page...</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      }
+    >
+      <PaymentPageContent />
+    </Suspense>
   );
 }
 
