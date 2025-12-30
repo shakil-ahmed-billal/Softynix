@@ -9,11 +9,13 @@ export const createReviewSchema = z.object({
   orderId: z.string().optional().nullable(),
   rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
   comment: z.string().min(1, 'Comment is required').max(1000, 'Comment must be less than 1000 characters').optional().nullable(),
+  image: z.string().url('Invalid image URL').optional().nullable().or(z.literal('')),
 });
 
 export const updateReviewSchema = z.object({
   rating: z.number().int().min(1).max(5).optional(),
   comment: z.string().min(1).max(1000).optional().nullable(),
+  image: z.string().url('Invalid image URL').optional().nullable().or(z.literal('')),
 });
 
 export const updateReviewStatusSchema = z.object({

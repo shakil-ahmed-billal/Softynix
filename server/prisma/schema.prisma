@@ -183,6 +183,7 @@ model Review {
   orderId   String?
   rating    Int // 1-5
   comment   String?  @db.Text
+  image     String?  // Review image URL from Cloudinary
   status    String   @default("pending") // pending, approved, rejected
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

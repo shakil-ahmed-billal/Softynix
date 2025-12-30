@@ -181,6 +181,7 @@ export class ReviewService {
     orderId?: string | null | undefined;
     rating: number;
     comment?: string | null | undefined;
+    image?: string | null | undefined;
   }): Promise<any> {
     // Verify user has purchased this product
     const hasAccess = await prisma.userProductAccess.findFirst({
@@ -231,6 +232,7 @@ export class ReviewService {
         orderId: data.orderId ?? null,
         rating: data.rating,
         comment: data.comment ?? null,
+        image: data.image ?? null,
         status: 'pending', // Admin must approve
       },
       include: {
@@ -263,6 +265,7 @@ export class ReviewService {
     data: {
       rating?: number | undefined;
       comment?: string | null | undefined;
+      image?: string | null | undefined;
     }
   ): Promise<any> {
     // Check if review exists and belongs to user
@@ -282,10 +285,12 @@ export class ReviewService {
     const updateData: {
       rating?: number;
       comment?: string | null;
+      image?: string | null;
     } = {};
     
     if (data.rating !== undefined) updateData.rating = data.rating;
     if (data.comment !== undefined) updateData.comment = data.comment ?? null;
+    if (data.image !== undefined) updateData.image = data.image ?? null;
 
     const review = await prisma.review.update({
       where: { id },

@@ -21,7 +21,7 @@ app.use(morgan("dev"));
 app.use(cors({
     origin: [
         "http://localhost:3000",
-        "https://notice-management-ten.vercel.app",
+        "https://softynix-emn3.vercel.app",
     ],
     credentials: true,
 }));

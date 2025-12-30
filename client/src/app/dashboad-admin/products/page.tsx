@@ -78,38 +78,62 @@ export default function AdminProductsPage() {
     const rawSlug = (formData.get("slug") as string) || "";
     const slug = rawSlug.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
     
-    const imageValue = (formData.get("image") as string) || "";
-    const descriptionValue = (formData.get("description") as string) || "";
+    // Handle image file upload
+    const imageFile = formData.get("image") as File;
+    const imageUrl = formData.get("image-url") as string;
     
-    const data = {
-      name: (formData.get("name") as string).trim(),
-      slug: slug,
-      description: descriptionValue.trim() || undefined,
-      price: parseFloat(formData.get("price") as string),
-      categoryId: formCategoryId || (formData.get("categoryId") as string),
-      stock: parseInt(formData.get("stock") as string) || 0,
-      status: formStatus || (formData.get("status") as string),
-      featured: formData.get("featured") === "on",
-      image: imageValue.trim() || undefined,
-    };
+    // Handle multiple images
+    const imagesFiles = formData.getAll("images") as File[];
+    
+    // Create new FormData for submission
+    const submitData = new FormData();
+    submitData.append("name", (formData.get("name") as string).trim());
+    submitData.append("slug", slug);
+    
+    const descriptionValue = (formData.get("description") as string) || "";
+    if (descriptionValue.trim()) {
+      submitData.append("description", descriptionValue.trim());
+    }
+    
+    submitData.append("price", formData.get("price") as string);
+    submitData.append("categoryId", formCategoryId || (formData.get("categoryId") as string));
+    submitData.append("stock", (formData.get("stock") as string) || "0");
+    submitData.append("status", formStatus || (formData.get("status") as string));
+    submitData.append("featured", formData.get("featured") === "on" ? "true" : "false");
+    
+    // Add image (file takes priority over URL)
+    if (imageFile && imageFile.size > 0) {
+      submitData.append("image", imageFile);
+    } else if (imageUrl && imageUrl.trim()) {
+      submitData.append("image", imageUrl.trim());
+    }
+    
+    // Add multiple images
+    imagesFiles.forEach((file) => {
+      if (file && file.size > 0) {
+        submitData.append("images", file);
+      }
+    });
 
     // Validation
-    if (!data.categoryId) {
+    const categoryId = formCategoryId || (formData.get("categoryId") as string);
+    if (!categoryId) {
       toast.error("Please select a category");
       return;
     }
 
-    if (!data.slug) {
+    if (!slug) {
       toast.error("Slug is required");
       return;
     }
 
     try {
       if (editingProduct) {
-        await updateProduct.mutateAsync({ id: editingProduct.id, ...data });
+        submitData.append("id", editingProduct.id);
+        await updateProduct.mutateAsync(submitData as any);
         toast.success("Product updated successfully");
       } else {
-        await createProduct.mutateAsync(data);
+        await createProduct.mutateAsync(submitData as any);
         toast.success("Product created successfully");
       }
       setIsDialogOpen(false);
@@ -240,13 +264,47 @@ export default function AdminProductsPage() {
                 <input type="hidden" name="categoryId" value={formCategoryId} />
               </div>
               <div>
-                <Label htmlFor="image">Image URL</Label>
+                <Label htmlFor="image">Image</Label>
+                <div className="space-y-2">
+                  <Input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    className="cursor-pointer"
+                  />
+                  <div className="text-sm text-muted-foreground">Or enter image URL:</div>
+                  <Input
+                    id="image-url"
+                    name="image-url"
+                    type="url"
+                    placeholder="https://example.com/image.jpg"
+                    defaultValue={editingProduct?.image || ""}
+                  />
+                  {editingProduct?.image && (
+                    <div className="relative w-full h-32 border rounded-md overflow-hidden bg-muted">
+                      <img
+                        src={editingProduct.image}
+                        alt="Current image"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="images">Additional Images (Multiple)</Label>
                 <Input
-                  id="image"
-                  name="image"
-                  type="url"
-                  defaultValue={editingProduct?.image}
+                  id="images"
+                  name="images"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="cursor-pointer"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  You can select multiple images
+                </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

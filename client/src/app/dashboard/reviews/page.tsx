@@ -74,19 +74,31 @@ export default function ReviewsPage() {
       return;
     }
 
+    const formData = new FormData(e.currentTarget);
+    const imageFile = formData.get("image") as File;
+    const imageUrl = formData.get("image-url") as string;
+
+    // Create FormData for submission
+    const submitData = new FormData();
+    submitData.append("rating", rating.toString());
+    if (comment.trim()) {
+      submitData.append("comment", comment.trim());
+    }
+    
+    // Add image (file takes priority over URL)
+    if (imageFile && imageFile.size > 0) {
+      submitData.append("image", imageFile);
+    } else if (imageUrl && imageUrl.trim()) {
+      submitData.append("image", imageUrl.trim());
+    }
+
     try {
       if (editingReview) {
-        await updateReview.mutateAsync({
-          id: editingReview.id,
-          rating,
-          comment: comment.trim() || undefined,
-        });
+        submitData.append("id", editingReview.id);
+        await updateReview.mutateAsync(submitData as any);
       } else {
-        await createReview.mutateAsync({
-          productId: selectedProductId,
-          rating,
-          comment: comment.trim() || undefined,
-        });
+        submitData.append("productId", selectedProductId);
+        await createReview.mutateAsync(submitData as any);
       }
       setIsDialogOpen(false);
       setEditingReview(null);
@@ -218,6 +230,36 @@ export default function ReviewsPage() {
                 <p className="text-xs text-muted-foreground mt-1">
                   {comment.length}/1000 characters
                 </p>
+              </div>
+
+              <div>
+                <Label htmlFor="image">Review Image (Optional)</Label>
+                <div className="space-y-2">
+                  <Input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    className="cursor-pointer"
+                  />
+                  <div className="text-sm text-muted-foreground">Or enter image URL:</div>
+                  <Input
+                    id="image-url"
+                    name="image-url"
+                    type="url"
+                    placeholder="https://example.com/image.jpg"
+                    defaultValue={editingReview?.image || ""}
+                  />
+                  {editingReview?.image && (
+                    <div className="relative w-full h-32 border rounded-md overflow-hidden bg-muted">
+                      <img
+                        src={editingReview.image}
+                        alt="Current review image"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end gap-2">

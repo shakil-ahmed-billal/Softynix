@@ -3,6 +3,7 @@ import { reviewService } from './review.service.js';
 import { sendSuccess, sendError } from '../../shared/apiResponse.js';
 import { asyncHandler } from '../../shared/errorHandler.js';
 import { removeUndefined } from '../../lib/utils.js';
+import { uploadToCloudinary, extractPublicIdFromUrl, deleteFromCloudinary } from '../../lib/cloudinary.js';
 import {
   createReviewSchema,
   updateReviewSchema,
@@ -110,7 +111,31 @@ export class ReviewController {
     if (!userId) {
       return sendError(res, 'User not authenticated', null, 401);
     }
-    const parsed = createReviewSchema.parse(req.body);
+
+    let imageUrl: string | undefined;
+
+    // Handle image upload
+    if (req.file) {
+      const uploadResult = await uploadToCloudinary(req.file.buffer, 'reviews');
+      imageUrl = uploadResult.secure_url;
+    } else if (req.body.image) {
+      // If image URL is provided, upload it to Cloudinary
+      if (req.body.image.startsWith('http')) {
+        try {
+          const uploadResult = await uploadToCloudinary(req.body.image, 'reviews');
+          imageUrl = uploadResult.secure_url;
+        } catch (error) {
+          imageUrl = req.body.image;
+        }
+      } else {
+        imageUrl = req.body.image;
+      }
+    }
+
+    const parsed = createReviewSchema.parse({
+      ...req.body,
+      image: imageUrl,
+    });
     const cleanData = removeUndefined(parsed) as typeof parsed;
     const review = await reviewService.createReview({
       ...cleanData,
@@ -129,7 +154,59 @@ export class ReviewController {
       return sendError(res, 'User not authenticated', null, 401);
     }
     const { id } = getReviewParamsSchema.parse(req.params);
-    const parsed = updateReviewSchema.parse(req.body);
+    
+    // Get existing review to check for old image
+    const existingReview = await reviewService.getReviewById(id);
+    
+    let imageUrl: string | undefined;
+
+    // Handle image upload
+    if (req.file) {
+      // Delete old image from Cloudinary if it exists
+      if (existingReview.image) {
+        const oldPublicId = extractPublicIdFromUrl(existingReview.image);
+        if (oldPublicId) {
+          try {
+            await deleteFromCloudinary(oldPublicId);
+          } catch (error) {
+            console.error('Error deleting old image:', error);
+          }
+        }
+      }
+      
+      const uploadResult = await uploadToCloudinary(req.file.buffer, 'reviews');
+      imageUrl = uploadResult.secure_url;
+    } else if (req.body.image !== undefined) {
+      if (req.body.image === '' || req.body.image === null) {
+        // Delete old image if empty string or null
+        if (existingReview.image) {
+          const oldPublicId = extractPublicIdFromUrl(existingReview.image);
+          if (oldPublicId) {
+            try {
+              await deleteFromCloudinary(oldPublicId);
+            } catch (error) {
+              console.error('Error deleting old image:', error);
+            }
+          }
+        }
+        imageUrl = undefined;
+      } else if (req.body.image.startsWith('http') && !req.body.image.includes('cloudinary.com')) {
+        // Upload new URL to Cloudinary
+        try {
+          const uploadResult = await uploadToCloudinary(req.body.image, 'reviews');
+          imageUrl = uploadResult.secure_url;
+        } catch (error) {
+          imageUrl = req.body.image;
+        }
+      } else {
+        imageUrl = req.body.image;
+      }
+    }
+
+    const parsed = updateReviewSchema.parse({
+      ...req.body,
+      ...(imageUrl !== undefined && { image: imageUrl }),
+    });
     const data = removeUndefined(parsed) as typeof parsed;
     const review = await reviewService.updateReview(id, userId, data);
     return sendSuccess(res, review, 'Review updated successfully');
