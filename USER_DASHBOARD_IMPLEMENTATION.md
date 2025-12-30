@@ -1,3 +1,26 @@
+# 🛒 Softynix – E-commerce Backend API
+
+Softynix is a scalable and production-ready **E-commerce Backend API** built with **Node.js, Express, PostgreSQL, and Prisma**.  
+It supports product management, orders, reviews, categories, admin users, and automated **Email & WhatsApp order notifications**.
+---
+
+## 🚀 Features
+
+- 🔐 Admin & User Management
+- 📦 Product & Category Management
+- 🛍️ Order Management
+- ⭐ Product Reviews
+- 📊 Recent Orders & Featured Products
+- 📧 Email Notifications (SMTP)
+- 💬 WhatsApp Notifications (Twilio)
+- ⚡ Prisma ORM with PostgreSQL
+- 🌱 Environment-based Configuration
+
+## Prerequisites and Dependencies 
+- **[Auth System](AUTH_SYSTEM.md)** - The authentication system is required for user authentication and authorization.
+- **[Frontend-Backend Connection](FRONTEND_BACKEND_CONNECTION.md)** - The frontend-backend connection is required for data exchange between the frontend and backend. 
+
+
 # User Dashboard Implementation Guide
 
 ## Overview
