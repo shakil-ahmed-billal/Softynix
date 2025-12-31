@@ -37,12 +37,13 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useTheme } from "next-themes";
+import { UseThemeProps, useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { ModeToggle } from "../theme/ModeToggle";
 
 
 export default function Header() {
@@ -63,6 +64,10 @@ export default function Header() {
   const userLogout = useLogout();
   const adminLogout = useAdminLogout();
   const router = useRouter();
+  const { theme: themeValue }: UseThemeProps = useTheme();
+  const themeLogo = themeValue === "light" ? "/logo/dark-softynix-logo.png" : "/logo/light-softynix-logo.png";
+
+  console.log(themeValue);
 
   // Prevent hydration mismatch by only rendering theme toggle after mount
   useEffect(() => {
@@ -105,10 +110,10 @@ export default function Header() {
             className="flex items-center space-x-2 flex-shrink-0 group"
           >
             <Image
-              src={"/logo/headerlogo.png"}
+              src={themeLogo}
               alt="Header Brand Logo"
-              width={150}
-              height={50}
+              width={40}
+              height={40}
             />
           </Link>
 
@@ -234,18 +239,7 @@ export default function Header() {
 
             {/* Theme Toggle */}
             {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="hover:bg-accent rounded-full transition-all"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </Button>
+              <ModeToggle />
             )}
 
             {/* User Account / Login */}

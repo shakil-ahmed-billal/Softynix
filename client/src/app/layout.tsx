@@ -1,13 +1,15 @@
+import { CartWrapper } from "@/components/cart/CartWrapper";
+import MobileFooter from "@/components/home/Mobile/layout/MobileFooter";
+import BottomNav from "@/components/layout/BottomNav";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
+import { AuthProvider } from "@/contexts/auth-context";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "./providers/theme-provider";
 import { QueryProvider } from "./providers/query-provider";
+import { ThemeProvider } from "./providers/theme-provider";
 import { ToastProvider } from "./providers/toast-provider";
-import { AuthProvider } from "@/contexts/auth-context";
-import { CartWrapper } from "@/components/cart/CartWrapper";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,17 +33,29 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
             <AuthProvider>
               <ToastProvider />
               <CartWrapper>
-                <div className="flex min-h-screen flex-col">
+                <header>
                   <Header />
+                </header>
+                <div className="flex min-h-screen flex-col">
                   <main className="flex-1">{children}</main>
-                  <Footer />
+                </div>
+                <footer>
+                  <div className="hidden md:block">
+                    <Footer />
+                  </div>
+                  <div className="block md:hidden">
+                    <MobileFooter />
+                  </div>
+                </footer>
+                <div className="md:hidden flex">
+                  <BottomNav />
                 </div>
               </CartWrapper>
             </AuthProvider>

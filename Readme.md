@@ -1,7 +1,6 @@
 # 🛒 Softynix – E-commerce Backend API
 
-Softynix is a scalable and production-ready **E-commerce Backend API** built with **Node.js, Express, PostgreSQL, and Prisma**.  
-It supports product management, orders, reviews, categories, admin users, and automated **Email & WhatsApp order notifications**.
+Softynix is a scalable and production-ready E-commerce Backend API built with Node.js, Express, PostgreSQL, and Prisma. It supports product management, orders, reviews, categories, admin users, and automated Email & WhatsApp order notifications.
 ---
 
 ## 🚀 Features
