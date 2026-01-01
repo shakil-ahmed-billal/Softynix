@@ -48,7 +48,7 @@ const MobileFooter = () => {
       </div>
       
       {/* Contact */}
-      <div className="space-y-2 mb-6 pb-6 border-b border-border/50">
+      <div className="space-y-2 mb-6 pb-6 ">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <MapPin className="w-4 h-4 text-primary" />
           123 Main Street, Dhaka
@@ -63,8 +63,10 @@ const MobileFooter = () => {
         </div>
       </div>
       
+      <img src="/payment.webp" alt="payment" className="w-full h-full object-cover" />
+
       {/* Copyright */}
-      <p className="text-xs text-muted-foreground text-center">
+      <p className="text-xs text-muted-foreground text-center pt-6">
         © 2023 Softynix. All rights reserved.
       </p>
     </footer>

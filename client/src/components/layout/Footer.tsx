@@ -105,7 +105,7 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-
+        <img src="/payment.webp" alt="payment" className="w-full h-full object-cover" />
         <div className="border-t pt-8 text-center text-sm text-muted-foreground">
           <p>© 2023 Softynix. All rights reserved.</p>
         </div>

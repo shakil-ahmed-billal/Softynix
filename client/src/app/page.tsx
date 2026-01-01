@@ -74,7 +74,7 @@ export default function Home() {
             <MobileWhyChooseUs />
           </div>
         </div>
-\        {/* Recent Orders */}
+       {/* Recent Orders */}
         <div className="">
           <div className="hidden md:block">
             <RecentOrders />

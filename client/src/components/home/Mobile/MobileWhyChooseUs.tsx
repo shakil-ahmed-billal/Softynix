@@ -12,7 +12,7 @@ const MobileWhyChooseUs = () => {
     <section className="px-4 py-6">
       <h2 className="text-lg font-bold text-foreground mb-4">কেন Softynix-ই সেরা?</h2>
       
-      <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-3">
         {features.map((feature, index) => {
           const Icon = feature.icon;
           return (
