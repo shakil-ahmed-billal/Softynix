@@ -1,19 +1,20 @@
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { GoogleTagManager } from "@/components/analytics/GoogleTagManager";
 import { CartWrapper } from "@/components/cart/CartWrapper";
+import { FacebookPixel } from "@/components/facebook/FacebookPixel";
 import MobileFooter from "@/components/home/Mobile/layout/MobileFooter";
 import BottomNav from "@/components/layout/BottomNav";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import { AuthProvider } from "@/contexts/auth-context";
+import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { QueryProvider } from "./providers/query-provider";
 import { ThemeProvider } from "./providers/theme-provider";
 import { ToastProvider } from "./providers/toast-provider";
-import { FacebookPixel } from "@/components/facebook/FacebookPixel";
-import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
-import Script from "next/script";
-import { generateMetadata, generateMetadata as generateSEOMetadata } from "@/lib/seo";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,9 +23,10 @@ const inter = Inter({
 
 const FACEBOOK_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || "";
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
+const GTM_CONTAINER_ID = process.env.NEXT_PUBLIC_GTM_CONTAINER_ID || "";
 
 // Home page metadata - optimized for SEO with trending keywords
-export const metadata: Metadata = generateMetadata({
+export const metadata: Metadata = generateSEOMetadata({
   title: "Softynix - Digital Product Marketplace | Buy AI Tools, Software & Courses",
   description:
     "Buy authentic digital products in Bangladesh. Premium AI subscriptions (ChatGPT, Claude), software licenses, productivity apps, and online courses. Best prices, instant delivery, trusted marketplace.",
@@ -91,8 +93,15 @@ export default function RootLayout({
             </noscript>
           </>
         )}
+        {/* Google Tag Manager - Must be first */}
+        {GTM_CONTAINER_ID && <GoogleTagManager containerId={GTM_CONTAINER_ID} />}
+        
+        {/* Facebook Pixel */}
         {FACEBOOK_PIXEL_ID && <FacebookPixel pixelId={FACEBOOK_PIXEL_ID} />}
+        
+        {/* Google Analytics */}
         {GA_MEASUREMENT_ID && <GoogleAnalytics measurementId={GA_MEASUREMENT_ID} />}
+        
         <QueryProvider>
           <ThemeProvider
             attribute="class"
