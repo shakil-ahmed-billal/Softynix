@@ -455,13 +455,12 @@ export class OrderService {
         paymentStatus: 'pending',
       };
 
-      // Link to user if logged in (use relation syntax)
+      // Link to user if logged in (use relation syntax only - don't set userId directly)
       if (data.userId) {
         orderData.user = {
           connect: { id: data.userId },
         };
-        // Also set userId directly to ensure it's available
-        orderData.userId = data.userId;
+        // Note: Don't set userId directly when using relation syntax - Prisma handles it
       }
 
       const newOrder = await tx.order.create({
@@ -500,10 +499,27 @@ export class OrderService {
         await this.createUserProductAccess(tx, orderWithUserId, orderItems, products);
       }
 
-      // Return order with items
+      // Return order with items and userId
+      // Fetch the order again to ensure userId is populated
       return tx.order.findUnique({
         where: { id: newOrder.id },
-        include: {
+        select: {
+          id: true,
+          orderNumber: true,
+          userId: true, // Explicitly select userId
+          customerName: true,
+          customerEmail: true,
+          customerPhone: true,
+          totalAmount: true,
+          status: true,
+          paymentStatus: true,
+          paymentMethod: true,
+          senderPhone: true,
+          transactionId: true,
+          shippingAddress: true,
+          notes: true,
+          createdAt: true,
+          updatedAt: true,
           items: {
             include: {
               product: {
