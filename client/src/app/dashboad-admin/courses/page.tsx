@@ -219,25 +219,53 @@ export default function AdminCoursesPage() {
 
     const modulesJson = JSON.stringify({ course: courseStructure });
 
-    const data = {
-      productId: selectedProductId,
-      title: (formData.get("title") as string).trim(),
-      description: (formData.get("description") as string).trim() || undefined,
-      instructor: (formData.get("instructor") as string).trim() || undefined,
-      duration: (formData.get("duration") as string).trim() || undefined,
-      level: (formData.get("level") as string) as "beginner" | "intermediate" | "advanced" | undefined,
-      language: (formData.get("language") as string) || "en",
-      thumbnail: (formData.get("thumbnail") as string).trim() || undefined,
-      videoUrl: (formData.get("videoUrl") as string).trim() || undefined,
-      modules: modulesJson,
-      status: formStatus,
-    };
+    // Handle thumbnail file upload
+    const thumbnailFile = formData.get("thumbnail") as File;
+    const thumbnailUrl = formData.get("thumbnail-url") as string;
+    
+    // Create new FormData for submission
+    const submitData = new FormData();
+    submitData.append("productId", selectedProductId);
+    submitData.append("title", (formData.get("title") as string).trim());
+    
+    const descriptionValue = (formData.get("description") as string).trim();
+    if (descriptionValue) {
+      submitData.append("description", descriptionValue);
+    }
+    
+    const instructorValue = (formData.get("instructor") as string).trim();
+    if (instructorValue) {
+      submitData.append("instructor", instructorValue);
+    }
+    
+    const durationValue = (formData.get("duration") as string).trim();
+    if (durationValue) {
+      submitData.append("duration", durationValue);
+    }
+    
+    const levelValue = formData.get("level") as string;
+    if (levelValue) {
+      submitData.append("level", levelValue);
+    }
+    
+    submitData.append("language", (formData.get("language") as string) || "en");
+    submitData.append("videoUrl", (formData.get("videoUrl") as string).trim() || "");
+    submitData.append("modules", modulesJson);
+    submitData.append("status", formStatus);
+    
+    // Add thumbnail (file takes priority over URL)
+    if (thumbnailFile && thumbnailFile.size > 0) {
+      submitData.append("thumbnail", thumbnailFile);
+    } else if (thumbnailUrl && thumbnailUrl.trim()) {
+      submitData.append("thumbnail", thumbnailUrl.trim());
+    }
 
     try {
       if (editingCourse) {
-        await updateCourse.mutateAsync({ id: editingCourse.id, ...data });
+        submitData.append("id", editingCourse.id);
+        await updateCourse.mutateAsync(submitData as any);
       } else {
-        await createCourse.mutateAsync(data);
+        await createCourse.mutateAsync(submitData as any);
       }
       setIsDialogOpen(false);
       setEditingCourse(null);
@@ -390,13 +418,33 @@ export default function AdminCoursesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="thumbnail">Thumbnail URL</Label>
-                  <Input
-                    id="thumbnail"
-                    name="thumbnail"
-                    type="url"
-                    defaultValue={editingCourse?.thumbnail}
-                  />
+                  <Label htmlFor="thumbnail">Thumbnail</Label>
+                  <div className="space-y-2">
+                    <Input
+                      id="thumbnail"
+                      name="thumbnail"
+                      type="file"
+                      accept="image/*"
+                      className="cursor-pointer"
+                    />
+                    <div className="text-sm text-muted-foreground">Or enter URL:</div>
+                    <Input
+                      id="thumbnail-url"
+                      name="thumbnail-url"
+                      type="url"
+                      placeholder="https://example.com/image.jpg"
+                      defaultValue={editingCourse?.thumbnail || ""}
+                    />
+                    {editingCourse?.thumbnail && (
+                      <div className="relative w-full h-32 border rounded-md overflow-hidden bg-muted">
+                        <img
+                          src={editingCourse.thumbnail}
+                          alt="Current thumbnail"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="videoUrl">Course Video URL</Label>

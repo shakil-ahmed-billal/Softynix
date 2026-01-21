@@ -28,8 +28,10 @@ export const useCreateCourse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CreateCourseData) => {
-      const response = await axiosAdmin.post("/api/courses", data);
+    mutationFn: async (data: CreateCourseData | FormData) => {
+      const response = await axiosAdmin.post("/api/courses", data, {
+        headers: data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+      });
       return response.data.data; // Extract data from API response
     },
     onSuccess: () => {
@@ -48,9 +50,22 @@ export const useUpdateCourse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateCourseData) => {
-      const { id, ...updateData } = data;
-      const response = await axiosAdmin.put(`/api/courses/${id}`, updateData);
+    mutationFn: async (data: UpdateCourseData | (FormData & { id: string })) => {
+      let id: string;
+      let updateData: any;
+      
+      if (data instanceof FormData) {
+        id = (data as any).id;
+        updateData = data;
+      } else {
+        id = data.id;
+        updateData = { ...data };
+        delete updateData.id;
+      }
+      
+      const response = await axiosAdmin.put(`/api/courses/${id}`, updateData, {
+        headers: updateData instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+      });
       return response.data.data; // Extract data from API response
     },
     onSuccess: () => {

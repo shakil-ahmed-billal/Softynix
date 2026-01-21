@@ -3,6 +3,7 @@ import { categoryService } from './category.service.js';
 import { sendSuccess } from '../../shared/apiResponse.js';
 import { asyncHandler } from '../../shared/errorHandler.js';
 import { removeUndefined } from '../../lib/utils.js';
+import { uploadToCloudinary, extractPublicIdFromUrl, deleteFromCloudinary } from '../../lib/cloudinary.js';
 import {
   createCategorySchema,
   updateCategorySchema,
@@ -76,7 +77,30 @@ export class CategoryController {
    * POST /api/categories
    */
   createCategory = asyncHandler(async (req: Request, res: Response) => {
-    const parsed = createCategorySchema.parse(req.body);
+    let imageUrl: string | undefined;
+
+    // Handle image upload
+    if (req.file) {
+      const uploadResult = await uploadToCloudinary(req.file.buffer, 'categories');
+      imageUrl = uploadResult.secure_url;
+    } else if (req.body.image) {
+      // If image URL is provided, upload it to Cloudinary
+      if (req.body.image.startsWith('http')) {
+        try {
+          const uploadResult = await uploadToCloudinary(req.body.image, 'categories');
+          imageUrl = uploadResult.secure_url;
+        } catch (error) {
+          imageUrl = req.body.image;
+        }
+      } else {
+        imageUrl = req.body.image;
+      }
+    }
+
+    const parsed = createCategorySchema.parse({
+      ...req.body,
+      image: imageUrl,
+    });
     const data = removeUndefined(parsed) as typeof parsed;
     const category = await categoryService.createCategory(data);
     return sendSuccess(res, category, 'Category created successfully', 201);
@@ -88,7 +112,60 @@ export class CategoryController {
    */
   updateCategory = asyncHandler(async (req: Request, res: Response) => {
     const { id } = getCategoryParamsSchema.parse(req.params);
-    const parsed = updateCategorySchema.parse({ ...req.body, id });
+    
+    // Get existing category to check for old image
+    const existingCategory = await categoryService.getCategoryById(id);
+    
+    let imageUrl: string | undefined;
+
+    // Handle image upload
+    if (req.file) {
+      // Delete old image from Cloudinary if it exists
+      if (existingCategory.image) {
+        const oldPublicId = extractPublicIdFromUrl(existingCategory.image);
+        if (oldPublicId) {
+          try {
+            await deleteFromCloudinary(oldPublicId);
+          } catch (error) {
+            console.error('Error deleting old image:', error);
+          }
+        }
+      }
+      
+      const uploadResult = await uploadToCloudinary(req.file.buffer, 'categories');
+      imageUrl = uploadResult.secure_url;
+    } else if (req.body.image !== undefined) {
+      if (req.body.image === '' || req.body.image === null) {
+        // Delete old image if empty string or null
+        if (existingCategory.image) {
+          const oldPublicId = extractPublicIdFromUrl(existingCategory.image);
+          if (oldPublicId) {
+            try {
+              await deleteFromCloudinary(oldPublicId);
+            } catch (error) {
+              console.error('Error deleting old image:', error);
+            }
+          }
+        }
+        imageUrl = undefined;
+      } else if (req.body.image.startsWith('http') && !req.body.image.includes('cloudinary.com')) {
+        // Upload new URL to Cloudinary
+        try {
+          const uploadResult = await uploadToCloudinary(req.body.image, 'categories');
+          imageUrl = uploadResult.secure_url;
+        } catch (error) {
+          imageUrl = req.body.image;
+        }
+      } else {
+        imageUrl = req.body.image;
+      }
+    }
+
+    const parsed = updateCategorySchema.parse({
+      ...req.body,
+      id,
+      ...(imageUrl !== undefined && { image: imageUrl }),
+    });
     const data = removeUndefined(parsed) as typeof parsed;
     const category = await categoryService.updateCategory(id, data);
     return sendSuccess(res, category, 'Category updated successfully');

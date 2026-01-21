@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { reviewController } from './review.controller.js';
 import { userAuth, adminAuth, optionalUserAuth } from '../../lib/auth.js';
+import { uploadSingle } from '../../lib/multer.js';
 
 /**
  * Review Routes
@@ -14,8 +15,8 @@ router.get('/product/:productId', optionalUserAuth, reviewController.getReviewsB
 
 // User routes (authenticated)
 router.get('/my-reviews', userAuth, reviewController.getMyReviews);
-router.post('/', userAuth, reviewController.createReview);
-router.put('/:id', userAuth, reviewController.updateReview);
+router.post('/', userAuth, uploadSingle('image'), reviewController.createReview);
+router.put('/:id', userAuth, uploadSingle('image'), reviewController.updateReview);
 router.delete('/:id', userAuth, reviewController.deleteReview);
 
 // Admin routes

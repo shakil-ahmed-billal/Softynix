@@ -1,6 +1,8 @@
 import { prisma } from '../../lib/prisma.js';
 import { AppError } from '../../shared/errorHandler.js';
 import { FilterParams, PaginatedResponse, PaginationParams } from '../../types/index.js';
+import { sendOrderConfirmationEmail } from '../../lib/email.js';
+import { sendOrderConfirmationWhatsApp } from '../../lib/whatsapp.js';
 
 /**
  * Order Service
@@ -524,6 +526,51 @@ export class OrderService {
           },
         },
       });
+    });
+
+    // Send email and WhatsApp notifications (don't await to avoid blocking)
+    // Send notifications asynchronously so they don't block the response
+    Promise.all([
+      sendOrderConfirmationEmail({
+        orderNumber: order.orderNumber,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        totalAmount: order.totalAmount.toString(),
+        items: order.items.map((item: any) => ({
+          product: {
+            name: item.product.name,
+            image: item.product.image,
+          },
+          quantity: item.quantity,
+          price: item.price.toString(),
+          subtotal: item.subtotal.toString(),
+        })),
+        paymentMethod: order.paymentMethod || undefined,
+        transactionId: order.transactionId || undefined,
+      }).catch((error) => {
+        console.error('Failed to send order confirmation email:', error);
+      }),
+
+      // sendOrderConfirmationWhatsApp({
+      //   orderNumber: order.orderNumber,
+      //   customerName: order.customerName,
+      //   customerPhone: order.customerPhone || '',
+      //   totalAmount: order.totalAmount.toString(),
+      //   items: order.items.map((item: any) => ({
+      //     product: {
+      //       name: item.product.name,
+      //     },
+      //     quantity: item.quantity,
+      //     subtotal: item.subtotal.toString(),
+      //   })),
+      //   paymentMethod: order.paymentMethod || undefined,
+      //   transactionId: order.transactionId || undefined,
+      // }).catch((error) => {
+      //   console.error('Failed to send order confirmation WhatsApp:', error);
+      // }),
+
+    ]).catch((error) => {
+      console.error('Error sending notifications:', error);
     });
 
     return order;

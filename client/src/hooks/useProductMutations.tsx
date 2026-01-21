@@ -30,9 +30,11 @@ export const useCreateProduct = () => {
   const axiosAdmin = useAxiosAdmin();
   const queryClient = useQueryClient();
 
-  return useMutation<ApiResponse<any>, Error, CreateProductData>({
+  return useMutation<ApiResponse<any>, Error, CreateProductData | FormData>({
     mutationFn: async (data) => {
-      const response = await axiosAdmin.post<ApiResponse<any>>("/api/products", data);
+      const response = await axiosAdmin.post<ApiResponse<any>>("/api/products", data, {
+        headers: data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -45,18 +47,33 @@ export const useUpdateProduct = () => {
   const axiosAdmin = useAxiosAdmin();
   const queryClient = useQueryClient();
 
-  return useMutation<ApiResponse<any>, Error, UpdateProductData>({
+  return useMutation<ApiResponse<any>, Error, UpdateProductData | (FormData & { id: string })>({
     mutationFn: async (data) => {
-      const { id, ...updateData } = data;
+      let id: string;
+      let updateData: any;
+      
+      if (data instanceof FormData) {
+        id = (data as any).id;
+        updateData = data;
+      } else {
+        id = data.id;
+        updateData = { ...data };
+        delete updateData.id;
+      }
+      
       const response = await axiosAdmin.put<ApiResponse<any>>(
         `/api/products/${id}`,
-        updateData
+        updateData,
+        {
+          headers: updateData instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+        }
       );
       return response.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
-      queryClient.invalidateQueries({ queryKey: ["product", variables.id] });
+      const id = variables instanceof FormData ? (variables as any).id : variables.id;
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
     },
   });
 };

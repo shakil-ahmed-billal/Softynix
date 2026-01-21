@@ -22,13 +22,18 @@ export const useCreateReview = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CreateReviewData) => {
-      const response = await axiosAuth.post("/api/reviews", data);
+    mutationFn: async (data: CreateReviewData | FormData) => {
+      const response = await axiosAuth.post("/api/reviews", data, {
+        headers: data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+      });
       return response.data.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
-      queryClient.invalidateQueries({ queryKey: ["reviews", "product", data.productId] });
+      const productId = data?.productId || (data as any)?.product?.id;
+      if (productId) {
+        queryClient.invalidateQueries({ queryKey: ["reviews", "product", productId] });
+      }
       queryClient.invalidateQueries({ queryKey: ["reviews", "my-reviews"] });
       toast.success("Review submitted successfully! It will be visible after approval.");
     },
@@ -43,14 +48,30 @@ export const useUpdateReview = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateReviewData) => {
-      const { id, ...updateData } = data;
-      const response = await axiosAuth.put(`/api/reviews/${id}`, updateData);
+    mutationFn: async (data: UpdateReviewData | (FormData & { id: string })) => {
+      let id: string;
+      let updateData: any;
+      
+      if (data instanceof FormData) {
+        id = (data as any).id;
+        updateData = data;
+      } else {
+        id = data.id;
+        updateData = { ...data };
+        delete updateData.id;
+      }
+      
+      const response = await axiosAuth.put(`/api/reviews/${id}`, updateData, {
+        headers: updateData instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+      });
       return response.data.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
-      queryClient.invalidateQueries({ queryKey: ["reviews", "product", data.productId] });
+      const productId = data?.productId || (data as any)?.product?.id;
+      if (productId) {
+        queryClient.invalidateQueries({ queryKey: ["reviews", "product", productId] });
+      }
       queryClient.invalidateQueries({ queryKey: ["reviews", "my-reviews"] });
       toast.success("Review updated successfully");
     },
