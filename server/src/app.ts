@@ -26,6 +26,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://softynix-emn3.vercel.app",
+      "https://softynix.vercel.app"
     ],
     credentials: true,
   })

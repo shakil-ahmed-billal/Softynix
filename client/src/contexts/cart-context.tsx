@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { Product, CartItem } from "@/types/product";
 import { useAuth } from "./auth-context";
+import { useFacebookPixel } from "@/hooks/useFacebookPixel";
+import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -25,6 +27,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const { isAuthenticated, user } = useAuth();
+  const { trackAddToCart } = useFacebookPixel();
+  const { trackAddToCart: trackGAAddToCart, trackRemoveFromCart: trackGARemoveFromCart } = useGoogleAnalytics();
 
   // Load cart from storage on mount
   useEffect(() => {
@@ -80,22 +84,71 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addToCart = (product: Product) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => String(item.id) === String(product.id));
-      if (existingItem) {
-        return prevItems.map((item) =>
-          String(item.id) === String(product.id)
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
+      const updatedItems = existingItem
+        ? prevItems.map((item) =>
+            String(item.id) === String(product.id)
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+        : [...prevItems, { ...product, quantity: 1 }];
+      
+      // Track AddToCart event for Facebook Pixel and Google Analytics
+      const item = updatedItems.find((item) => String(item.id) === String(product.id));
+      if (item) {
+        // Facebook Pixel tracking
+        trackAddToCart({
+          value: item.priceValue * item.quantity,
+          currency: "BDT",
+          content_name: product.title,
+          content_ids: [String(product.id)],
+          content_type: "product",
+          quantity: item.quantity,
+        });
+
+        // Google Analytics tracking
+        trackGAAddToCart({
+          currency: "BDT",
+          value: item.priceValue * item.quantity,
+          items: [
+            {
+              item_id: String(product.id),
+              item_name: product.title,
+              item_category: product.categoryId ? String(product.categoryId) : undefined,
+              price: item.priceValue,
+              quantity: item.quantity,
+            },
+          ],
+        });
       }
-      return [...prevItems, { ...product, quantity: 1 }];
+      
+      return updatedItems;
     });
     setIsCartOpen(true);
   };
 
   const removeFromCart = (productId: string | number) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => String(item.id) !== String(productId))
-    );
+    setCartItems((prevItems) => {
+      const itemToRemove = prevItems.find((item) => String(item.id) === String(productId));
+      
+      // Track remove from cart in Google Analytics
+      if (itemToRemove) {
+        trackGARemoveFromCart({
+          currency: "BDT",
+          value: itemToRemove.priceValue * itemToRemove.quantity,
+          items: [
+            {
+              item_id: String(itemToRemove.id),
+              item_name: itemToRemove.title,
+              item_category: itemToRemove.categoryId ? String(itemToRemove.categoryId) : undefined,
+              price: itemToRemove.priceValue,
+              quantity: itemToRemove.quantity,
+            },
+          ],
+        });
+      }
+      
+      return prevItems.filter((item) => String(item.id) !== String(productId));
+    });
   };
 
   const updateQuantity = (productId: string | number, quantity: number) => {

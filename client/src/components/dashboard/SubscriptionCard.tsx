@@ -51,17 +51,23 @@ export function SubscriptionCard({ subscription }: SubscriptionCardProps) {
           <label className="text-xs font-medium text-muted-foreground">
             Account Email
           </label>
-          <div className="flex items-center gap-2 mt-1">
-            <p className="text-sm font-medium flex-1">{subscription.accountEmail}</p>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => handleCopy(subscription.accountEmail)}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-          </div>
+          {subscription.accountEmail ? (
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm font-medium flex-1">{subscription.accountEmail}</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => handleCopy(subscription.accountEmail)}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground italic mt-1">
+              Credentials pending - Admin will provide them soon
+            </p>
+          )}
         </div>
 
         {/* Password */}
@@ -69,31 +75,37 @@ export function SubscriptionCard({ subscription }: SubscriptionCardProps) {
           <label className="text-xs font-medium text-muted-foreground">
             Password
           </label>
-          <div className="flex items-center gap-2 mt-1">
-            <p className="text-sm font-mono flex-1">
-              {showPassword ? subscription.password : "••••••••"}
+          {subscription.password ? (
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm font-mono flex-1">
+                {showPassword ? subscription.password : "••••••••"}
+              </p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => handleCopy(subscription.password)}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground italic mt-1">
+              Credentials pending - Admin will provide them soon
             </p>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => handleCopy(subscription.password)}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-          </div>
+          )}
         </div>
 
         {/* Dates */}

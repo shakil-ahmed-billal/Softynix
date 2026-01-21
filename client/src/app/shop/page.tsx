@@ -15,8 +15,9 @@ import {
 } from "@/components/ui/select";
 import { useAllProducts } from "@/hooks/useAllProducts";
 import { useActiveCategories } from "@/hooks/useCategories";
+import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
 import { Grid3x3, List, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 export default function ShopPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -27,6 +28,7 @@ export default function ShopPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [page, setPage] = useState(1);
   const limit = 20;
+  const { trackSearch, trackViewItemList } = useGoogleAnalytics();
 
   // Fetch products from API
   // Only send categoryId if it's a valid UUID and exactly one category is selected
@@ -51,6 +53,33 @@ export default function ShopPage() {
 
   // Fetch categories for filter
   const { data: categories } = useActiveCategories();
+
+  // Track search events
+  useEffect(() => {
+    if (searchQuery.trim() && searchQuery.length > 2) {
+      // Debounce search tracking
+      const timer = setTimeout(() => {
+        trackSearch({ search_term: searchQuery });
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [searchQuery, trackSearch]);
+
+  // Track view_item_list when products are loaded
+  useEffect(() => {
+    if (formattedProducts.length > 0) {
+      trackViewItemList({
+        item_list_name: "Shop",
+        items: formattedProducts.slice(0, 20).map((product) => ({
+          item_id: String(product.id),
+          item_name: product.title,
+          item_category: product.categoryId ? String(product.categoryId) : undefined,
+          price: product.priceValue,
+        })),
+      });
+    }
+  }, [ trackViewItemList]);
 
   // Format products for ProductCard component
   const formattedProducts = useMemo(() => {

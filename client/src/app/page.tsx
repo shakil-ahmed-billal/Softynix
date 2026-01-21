@@ -19,98 +19,111 @@ import Reviews from "@/components/home/Reviews";
 import TrendingProducts from "@/components/home/TrendingProducts";
 import TrustSection from "@/components/home/TrustSection";
 import VideoSection from "@/components/home/VideoSection";
+import { StructuredData } from "@/components/seo/StructuredData";
+import {
+  generateOrganizationSchema,
+  generateWebsiteSchema,
+} from "@/lib/seo";
 
 export default function Home() {
-  return (
-    <div className="">
-      <div className="flex flex-col">
-        <HeroSection />
-        {/* Categories */}
-        <div className="">
-          <div className="hidden md:block">
-            <CategorySection />
-          </div>
-          <div className="block md:hidden">
-            <MobileViewCategoriesSection />
-          </div>
-        </div>
-        {/* Best Selling Products */}
-        <div className="">
-          <div className="hidden md:block">
-            <BestSelling />
-          </div>
-          <div className="block md:hidden">
-            <MobileViewProductsSection
-              title="সেরা বিক্রিত প্রোডাক্টসমূহ"
-              showViewAll={true}
-            />
-          </div>
-        </div>
-        {/* Offer Banner */}
-        <div className="">
-          <div className="hidden md:block">
-            <OfferBanner />
-          </div>
-          <div className="block md:hidden">
-            <MobileCountdownSection />
-          </div>
-        </div>
-        {/* Trending Products */}
-        <div className="">
-          <div className="hidden md:block">
-            <TrendingProducts />
-          </div>
-          <div className="block md:hidden">
-            <MobileTrendingProducts/>
-          </div>
-        </div>
+  const structuredData = [
+    generateOrganizationSchema(),
+    generateWebsiteSchema(),
+  ];
 
-        {/* Why Choose Us */}
-        <div className="">
-          <div className="hidden md:block">
-            <TrustSection />
+  return (
+    <>
+      <StructuredData data={structuredData} />
+      <div className="">
+        <div className="flex flex-col">
+          <HeroSection />
+          {/* Categories */}
+          <div className="">
+            <div className="hidden md:block">
+              <CategorySection />
+            </div>
+            <div className="block md:hidden">
+              <MobileViewCategoriesSection />
+            </div>
           </div>
-          <div className="block md:hidden">
-            <MobileWhyChooseUs />
+          {/* Best Selling Products */}
+          <div className="">
+            <div className="hidden md:block">
+              <BestSelling />
+            </div>
+            <div className="block md:hidden">
+              <MobileViewProductsSection
+                title="সেরা বিক্রিত প্রোডাক্টসমূহ"
+                showViewAll={true}
+              />
+            </div>
           </div>
-        </div>
-       {/* Recent Orders */}
-        <div className="">
-          <div className="hidden md:block">
-            <RecentOrders />
+          {/* Offer Banner */}
+          <div className="">
+            <div className="hidden md:block">
+              <OfferBanner />
+            </div>
+            <div className="block md:hidden">
+              <MobileCountdownSection />
+            </div>
           </div>
-          <div className="block md:hidden">
-            <MobileViewRecentOrders />
+          {/* Trending Products */}
+          <div className="">
+            <div className="hidden md:block">
+              <TrendingProducts />
+            </div>
+            <div className="block md:hidden">
+              <MobileTrendingProducts/>
+            </div>
           </div>
-        </div>
-        {/* Testimonials */}
-        <div className="">
-          <div className="hidden md:block">
-            <Reviews />
+
+          {/* Why Choose Us */}
+          <div className="">
+            <div className="hidden md:block">
+              <TrustSection />
+            </div>
+            <div className="block md:hidden">
+              <MobileWhyChooseUs />
+            </div>
           </div>
-          <div className="block md:hidden">
-            <MobileTestimonials />
+         {/* Recent Orders */}
+          <div className="">
+            <div className="hidden md:block">
+              <RecentOrders />
+            </div>
+            <div className="block md:hidden">
+              <MobileViewRecentOrders />
+            </div>
           </div>
-        </div>
-        {/* Why Choose Us */}
-        <div className="">
-          <div className="hidden md:block">
-            <TrustSection />
+          {/* Testimonials */}
+          <div className="">
+            <div className="hidden md:block">
+              <Reviews />
+            </div>
+            <div className="block md:hidden">
+              <MobileTestimonials />
+            </div>
           </div>
-          <div className="block md:hidden">
-            <MobileTrustSection />
+          {/* Why Choose Us */}
+          <div className="">
+            <div className="hidden md:block">
+              <TrustSection />
+            </div>
+            <div className="block md:hidden">
+              <MobileTrustSection />
+            </div>
           </div>
-        </div>
-        {/* About Section */}
-        <div className="">
-          <div className="hidden md:block">
-            <AboutSection />
-          </div>
-          <div className="block md:hidden">
-            <MobileAboutSection />
+          {/* About Section */}
+          <div className="">
+            <div className="hidden md:block">
+              <AboutSection />
+            </div>
+            <div className="block md:hidden">
+              <MobileAboutSection />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

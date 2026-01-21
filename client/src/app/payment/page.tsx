@@ -1,15 +1,10 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCart } from "@/contexts/cart-context";
-import { useAuth } from "@/contexts/auth-context";
-import { useCreateOrder } from "@/hooks/useOrderMutations";
+import ClientWrapper from "@/components/shared/ClientWrapper";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -17,9 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CreditCard, CheckCircle2, ArrowLeft, Wallet, Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/auth-context";
+import { useCart } from "@/contexts/cart-context";
+import { useFacebookPixel } from "@/hooks/useFacebookPixel";
+import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
+import { useCreateOrder } from "@/hooks/useOrderMutations";
+import { ArrowLeft, CheckCircle2, Loader2, Wallet } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import Link from "next/link";
 
 const PAYMENT_METHODS = [
   { value: "Bkash", label: "Bkash" },
@@ -36,6 +38,8 @@ function PaymentPageContent() {
   const { cartItems, getTotalPrice, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const createOrder = useCreateOrder();
+  const { trackInitiateCheckout, trackPurchase } = useFacebookPixel();
+  const { trackBeginCheckout, trackPurchase: trackGAPurchase } = useGoogleAnalytics();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get order data from query params (passed from checkout)
@@ -54,8 +58,33 @@ function PaymentPageContent() {
     if (cartItems.length === 0) {
       toast.error("Your cart is empty");
       router.push("/cart");
+      return;
     }
-  }, [cartItems, router]);
+
+    // Track InitiateCheckout event for Facebook Pixel and Google Analytics
+    const total = getTotalPrice();
+    
+    // Facebook Pixel
+    trackInitiateCheckout({
+      value: total,
+      currency: "BDT",
+      content_ids: cartItems.map((item) => String(item.id)),
+      num_items: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+    });
+
+    // Google Analytics
+    trackBeginCheckout({
+      currency: "BDT",
+      value: total,
+      items: cartItems.map((item) => ({
+        item_id: String(item.id),
+        item_name: item.title,
+        item_category: item.categoryId ? String(item.categoryId) : undefined,
+        price: item.priceValue,
+        quantity: item.quantity,
+      })),
+    });
+  }, [cartItems, router, getTotalPrice, trackInitiateCheckout, trackBeginCheckout]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -127,6 +156,35 @@ function PaymentPageContent() {
         senderPhone: formData.senderPhone.trim(),
         transactionId: formData.transactionId.trim(),
         items: orderItems,
+      });
+
+      // Track Purchase event for Facebook Pixel and Google Analytics
+      const total = getTotalPrice();
+      
+      // Facebook Pixel
+      trackPurchase({
+        value: total,
+        currency: "BDT",
+        content_name: `Order ${result.data.orderNumber}`,
+        content_ids: cartItems.map((item) => String(item.id)),
+        contents: cartItems.map((item) => ({
+          id: String(item.id),
+          quantity: item.quantity,
+        })),
+      });
+
+      // Google Analytics
+      trackGAPurchase({
+        transaction_id: result.data.orderNumber,
+        value: total,
+        currency: "BDT",
+        items: cartItems.map((item) => ({
+          item_id: String(item.id),
+          item_name: item.title,
+          item_category: item.categoryId ? String(item.categoryId) : undefined,
+          price: item.priceValue,
+          quantity: item.quantity,
+        })),
       });
 
       // Clear cart on success
@@ -366,7 +424,10 @@ export default function PaymentPage() {
         </div>
       }
     >
+      <ClientWrapper>
       <PaymentPageContent />
+
+      </ClientWrapper>
     </Suspense>
   );
 }

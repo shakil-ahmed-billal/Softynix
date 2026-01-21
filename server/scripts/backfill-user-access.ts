@@ -125,29 +125,32 @@ async function backfillUserAccess(userEmail: string) {
           item.product.name
         );
 
-        // Generate credentials based on product type
+        // Only use admin-created credentials - no automatic generation
+        const productCredentials = await prisma.productCredentials.findUnique({
+          where: { productId: item.productId },
+        });
+
+        // Initialize credential variables - will only be set if admin has created credentials
         let email: string | undefined;
         let password: string | undefined;
         let licenseKey: string | undefined;
         let subscriptionStatus: string | undefined;
         let expiresAt: Date | undefined;
+        let accessUrl: string | undefined;
+        let downloadUrl: string | undefined;
 
-        if (productType === 'ai_subscription' || productType === 'productivity_app') {
-          // Generate email and password for subscriptions/apps
-          const emailPrefix = order.customerEmail.split('@')[0];
-          email = `${emailPrefix}+${item.product.slug}@softynix.com`;
-          password = `Pass${Math.random().toString(36).substring(2, 10)}!`;
-          subscriptionStatus = 'active';
-          // Set expiry to 1 year from now
-          expiresAt = new Date();
-          expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-        } else if (productType === 'software_license') {
-          // Generate license key
-          licenseKey = `LIC-${item.product.slug.toUpperCase()}-${Math.random().toString(36).substring(2, 12).toUpperCase()}`;
-        } else if (productType === 'course') {
-          // Course specific fields
-          subscriptionStatus = 'active';
+        if (productCredentials) {
+          // Use admin-created credentials only
+          email = productCredentials.email;
+          password = productCredentials.password;
+          licenseKey = productCredentials.licenseKey;
+          subscriptionStatus = productCredentials.subscriptionStatus || 'active';
+          expiresAt = productCredentials.expiresAt || undefined;
+          accessUrl = productCredentials.accessUrl;
+          downloadUrl = productCredentials.downloadUrl;
         }
+        // If no admin credentials exist, all values remain undefined/null
+        // Admin must create credentials from the admin dashboard
 
         await prisma.userProductAccess.create({
           data: {
@@ -159,6 +162,8 @@ async function backfillUserAccess(userEmail: string) {
             email,
             password,
             licenseKey,
+            accessUrl,
+            downloadUrl,
             subscriptionStatus,
             expiresAt,
             status: 'active',

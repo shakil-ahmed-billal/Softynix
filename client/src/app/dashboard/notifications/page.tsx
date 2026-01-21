@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Bell, Mail, MessageSquare } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default function NotificationsPage() {
   return (

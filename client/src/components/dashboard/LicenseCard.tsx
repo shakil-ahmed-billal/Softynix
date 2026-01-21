@@ -48,17 +48,23 @@ export function LicenseCard({ license }: LicenseCardProps) {
           <label className="text-xs font-medium text-muted-foreground">
             License Key
           </label>
-          <div className="flex items-center gap-2 mt-1">
-            <p className="text-sm font-mono flex-1">{license.licenseKey}</p>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => handleCopy(license.licenseKey)}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-          </div>
+          {license.licenseKey ? (
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm font-mono flex-1">{license.licenseKey}</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => handleCopy(license.licenseKey)}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground italic mt-1">
+              License key pending - Admin will provide it soon
+            </p>
+          )}
         </div>
 
         {/* Device Limit */}

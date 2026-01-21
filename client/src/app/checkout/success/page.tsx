@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Package, Home, ShoppingBag, Loader2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle2, Home, Loader2, Package, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
@@ -93,7 +93,9 @@ export default function CheckoutSuccessPage() {
         </div>
       }
     >
-      <CheckoutSuccessContent />
+
+            <CheckoutSuccessContent />
+
     </Suspense>
   );
 }
