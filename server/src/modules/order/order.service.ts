@@ -1,8 +1,7 @@
+import { sendOrderConfirmationEmail } from '../../lib/email.js';
 import { prisma } from '../../lib/prisma.js';
 import { AppError } from '../../shared/errorHandler.js';
 import { FilterParams, PaginatedResponse, PaginationParams } from '../../types/index.js';
-import { sendOrderConfirmationEmail } from '../../lib/email.js';
-import { sendOrderConfirmationWhatsApp } from '../../lib/whatsapp.js';
 
 /**
  * Order Service
@@ -117,11 +116,12 @@ export class OrderService {
       );
 
       // Try to get product credentials from admin-created template
+      // Only use credentials if admin has created them - no automatic generation
       const productCredentials = await tx.productCredentials.findUnique({
         where: { productId: item.productId },
       });
 
-      // Use credentials from template if available, otherwise generate
+      // Initialize credential variables - will only be set if admin has created credentials
       let email: string | undefined;
       let password: string | undefined;
       let licenseKey: string | undefined;
@@ -131,7 +131,7 @@ export class OrderService {
       let downloadUrl: string | undefined;
 
       if (productCredentials) {
-        // Use admin-created credentials
+        // Use admin-created credentials only
         email = productCredentials.email;
         password = productCredentials.password;
         licenseKey = productCredentials.licenseKey;
@@ -139,25 +139,9 @@ export class OrderService {
         expiresAt = productCredentials.expiresAt || undefined;
         accessUrl = productCredentials.accessUrl;
         downloadUrl = productCredentials.downloadUrl;
-      } else {
-        // Fallback: Generate credentials based on product type
-        if (productType === 'ai_subscription' || productType === 'productivity_app') {
-          // Generate email and password for subscriptions/apps
-          const emailPrefix = order.customerEmail.split('@')[0];
-          email = `${emailPrefix}+${item.product.slug}@softynix.com`;
-          password = `Pass${Math.random().toString(36).substring(2, 10)}!`;
-          subscriptionStatus = 'active';
-          // Set expiry to 1 year from now
-          expiresAt = new Date();
-          expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-        } else if (productType === 'software_license') {
-          // Generate license key
-          licenseKey = `LIC-${item.product.slug.toUpperCase()}-${Math.random().toString(36).substring(2, 12).toUpperCase()}`;
-        } else if (productType === 'course') {
-          // Course specific fields
-          subscriptionStatus = 'active';
-        }
       }
+      // If no admin credentials exist, all values remain undefined/null
+      // Admin must create credentials from the admin dashboard
 
       await tx.userProductAccess.create({
         data: {
@@ -476,6 +460,8 @@ export class OrderService {
         orderData.user = {
           connect: { id: data.userId },
         };
+        // Also set userId directly to ensure it's available
+        orderData.userId = data.userId;
       }
 
       const newOrder = await tx.order.create({
@@ -507,8 +493,11 @@ export class OrderService {
 
       // Create UserProductAccess entries if user is logged in
       // We'll create them even for pending orders, they'll be activated when payment is confirmed
-      if (newOrder.userId) {
-        await this.createUserProductAccess(tx, newOrder, orderItems, products);
+      // Use data.userId directly since newOrder.userId might not be populated immediately
+      if (data.userId) {
+        // Ensure the order object has userId for createUserProductAccess
+        const orderWithUserId = { ...newOrder, userId: data.userId };
+        await this.createUserProductAccess(tx, orderWithUserId, orderItems, products);
       }
 
       // Return order with items
@@ -638,23 +627,33 @@ export class OrderService {
     });
 
     // If payment status changed to 'paid' and user exists, create/activate UserProductAccess
+    // Note: UserProductAccess should already be created during order creation
+    // This is just a safety check in case it wasn't created initially
     if (
       data.paymentStatus === 'paid' &&
       order.userId &&
       existingOrder.paymentStatus !== 'paid'
     ) {
       await prisma.$transaction(async (tx: any) => {
-        // Get products for the order
-        const products = await tx.product.findMany({
-          where: {
-            id: { in: order.items.map((item: any) => item.productId) },
-          },
-          include: {
-            category: true,
-          },
+        // Check if UserProductAccess entries already exist for this order
+        const existingAccess = await tx.userProductAccess.findFirst({
+          where: { orderId: order.id },
         });
 
-        await this.createUserProductAccess(tx, order, order.items, products);
+        // Only create if they don't exist
+        if (!existingAccess) {
+          // Get products for the order
+          const products = await tx.product.findMany({
+            where: {
+              id: { in: order.items.map((item: any) => item.productId) },
+            },
+            include: {
+              category: true,
+            },
+          });
+
+          await this.createUserProductAccess(tx, order, order.items, products);
+        }
       });
     }
 

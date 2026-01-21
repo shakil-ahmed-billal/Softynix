@@ -1,22 +1,28 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { useSingleProduct } from "@/hooks/useSingleProduct";
-import { useReviewsByProductId } from "@/hooks/useReviews";
+import { StructuredData } from "@/components/seo/StructuredData";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ShoppingCart, Star, Loader2 } from "lucide-react";
-import { useCart } from "@/contexts/cart-context";
 import { Separator } from "@/components/ui/separator";
-import { useMemo } from "react";
+import { useCart } from "@/contexts/cart-context";
+import { useFacebookPixel } from "@/hooks/useFacebookPixel";
+import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
+import { useReviewsByProductId } from "@/hooks/useReviews";
+import { useSingleProduct } from "@/hooks/useSingleProduct";
+import { generateBreadcrumbSchema, generateProductSchema } from "@/lib/seo";
+import { ArrowLeft, Loader2, ShoppingCart, Star } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { addToCart } = useCart();
+  const { trackViewContent } = useFacebookPixel();
+  const { trackViewItem } = useGoogleAnalytics();
   const productId = params.id as string;
   const { data: product, isLoading, error: productError } = useSingleProduct(productId);
   const { data: reviews = [], isLoading: reviewsLoading, error: reviewsError } = useReviewsByProductId(productId);
@@ -34,6 +40,34 @@ export default function ProductDetailPage() {
       category: product.category,
     };
   }, [product]);
+
+  // Track ViewContent event when product is loaded
+  useEffect(() => {
+    if (formattedProduct) {
+      // Facebook Pixel
+      trackViewContent({
+        content_name: formattedProduct.title,
+        content_ids: [String(formattedProduct.id)],
+        content_type: "product",
+        value: formattedProduct.priceValue,
+        currency: "BDT",
+      });
+
+      // Google Analytics
+      trackViewItem({
+        currency: "BDT",
+        value: formattedProduct.priceValue,
+        items: [
+          {
+            item_id: String(formattedProduct.id),
+            item_name: formattedProduct.title,
+            item_category: formattedProduct.category?.name,
+            price: formattedProduct.priceValue,
+          },
+        ],
+      });
+    }
+  }, [formattedProduct, trackViewContent, trackViewItem]);
 
   const handleBuyNow = () => {
     if (!formattedProduct) return;
@@ -98,8 +132,30 @@ export default function ProductDetailPage() {
     return null;
   }
 
+  // Generate structured data for SEO
+  const productSchema = generateProductSchema({
+    name: product.name,
+    description: product.description || `${product.name} - Available at Softynix`,
+    price: Number(product.price),
+    image: product.image || undefined,
+    category: product.category?.name,
+    availability: product.stock > 0 ? "InStock" : "OutOfStock",
+    sku: product.id,
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Shop", url: "/shop" },
+    { name: product.category?.name || "Products", url: `/shop?category=${product.categoryId}` },
+    { name: product.name, url: `/products/${product.id}` },
+  ]);
+
+  const structuredData = [productSchema, breadcrumbSchema];
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <StructuredData data={structuredData} />
+      <div className="container mx-auto px-4 py-8">
       <Button
         variant="ghost"
         onClick={() => router.back()}
@@ -292,5 +348,6 @@ export default function ProductDetailPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

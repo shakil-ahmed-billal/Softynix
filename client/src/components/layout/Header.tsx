@@ -448,7 +448,7 @@ export default function Header() {
                       <>
                         <DropdownMenuItem asChild>
                           <Link
-                            href="/dashboard-admin"
+                            href="/dashboad-admin"
                             className="cursor-pointer hover:bg-[hsl(142,76%,36%)]/5"
                           >
                             <LayoutDashboard className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLogin } from "@/hooks/useAuth";
 import { useAuth } from "@/contexts/auth-context";
+import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const login = useLogin();
   const { login: contextLogin } = useAuth();
+  const { trackLogin } = useGoogleAnalytics();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +28,10 @@ export default function LoginPage() {
     try {
       const result = await login.mutateAsync({ email, password });
       contextLogin(result.user);
+      
+      // Track login event
+      trackLogin("email");
+      
       toast.success("Login successful!");
       router.push("/dashboard");
     } catch (error: any) {

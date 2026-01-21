@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSignup } from "@/hooks/useAuth";
 import { useAuth } from "@/contexts/auth-context";
+import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +23,7 @@ function SignupPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const signup = useSignup();
   const { login: contextLogin } = useAuth();
+  const { trackSignUp } = useGoogleAnalytics();
 
   // Get redirect URL from query params
   const redirectUrl = searchParams.get("redirect") || "/dashboard";
@@ -38,6 +40,10 @@ function SignupPageContent() {
         phone: phone || undefined,
       });
       contextLogin(result.user);
+      
+      // Track signup event
+      trackSignUp("email");
+      
       toast.success("Account created successfully!");
       // Redirect to the specified URL or dashboard
       router.push(redirectUrl);

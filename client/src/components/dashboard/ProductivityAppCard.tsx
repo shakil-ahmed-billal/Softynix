@@ -35,56 +35,64 @@ export function ProductivityAppCard({ app }: ProductivityAppCardProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Login Info */}
-        {app.loginInfo && (
-          <>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">
-                Email
-              </label>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-sm font-medium flex-1">{app.loginInfo.email}</p>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => handleCopy(app.loginInfo!.email)}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground">
+            Email
+          </label>
+          {app.loginInfo?.email ? (
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm font-medium flex-1">{app.loginInfo.email}</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => handleCopy(app.loginInfo!.email)}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
             </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">
-                Password
-              </label>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-sm font-mono flex-1">
-                  {showPassword ? app.loginInfo.password : "••••••••"}
-                </p>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => handleCopy(app.loginInfo!.password)}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
+          ) : (
+            <p className="text-sm text-muted-foreground italic mt-1">
+              Credentials pending - Admin will provide them soon
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground">
+            Password
+          </label>
+          {app.loginInfo?.password ? (
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm font-mono flex-1">
+                {showPassword ? app.loginInfo.password : "••••••••"}
+              </p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => handleCopy(app.loginInfo!.password)}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
             </div>
-          </>
-        )}
+          ) : (
+            <p className="text-sm text-muted-foreground italic mt-1">
+              Credentials pending - Admin will provide them soon
+            </p>
+          )}
+        </div>
 
         {/* Expiry Date */}
         {app.expiryDate && (
