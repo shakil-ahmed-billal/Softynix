@@ -2,17 +2,6 @@
 
 import { useCallback } from "react";
 
-declare global {
-  interface Window {
-    gtag: (
-      command: string,
-      targetId: string | Date,
-      config?: Record<string, any>
-    ) => void;
-    dataLayer: any[];
-  }
-}
-
 /**
  * Hook for tracking Google Analytics 4 events
  * Usage:

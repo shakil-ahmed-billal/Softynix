@@ -1,44 +1,36 @@
 "use client";
 
-import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-
-declare global {
-  interface Window {
-    fbq: (
-      action: string,
-      event: string,
-      params?: Record<string, any>
-    ) => void;
-    _fbq: typeof window.fbq;
-  }
-}
+import { Suspense, useEffect } from "react";
 
 interface FacebookPixelProps {
   pixelId: string;
 }
 
-export function FacebookPixel({ pixelId }: FacebookPixelProps) {
+function FacebookPixelContent({ pixelId }: FacebookPixelProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Initialize Facebook Pixel
+    if (typeof window === "undefined") return;
+
+    // Check if fbq is already initialized (from layout.tsx script)
     if (!window.fbq) {
+      // Initialize fbq if not already loaded
       (function (f: any, b: any, e: any, v: any, n?: any, t?: any, s?: any) {
         if (f.fbq) return;
-        n = f.fbq = function () {
+        n = f.fbq = function (...args: any[]) {
           n.callMethod
-            ? n.callMethod.apply(n, arguments)
-            : n.queue.push(arguments);
+            ? n.callMethod.apply(n, args)
+            : n.queue.push(args);
         };
-        if (!f._fbq) f._fbq = n;
+        f._fbq = n;
         n.push = n;
-        n.loaded = !0;
+        n.loaded = true;
         n.version = "2.0";
         n.queue = [];
         t = b.createElement(e);
-        t.async = !0;
+        t.async = true;
         t.src = v;
         s = b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t, s);
@@ -49,17 +41,30 @@ export function FacebookPixel({ pixelId }: FacebookPixelProps) {
         "https://connect.facebook.net/en_US/fbevents.js"
       );
 
-      window.fbq("init", pixelId);
-      window.fbq("track", "PageView");
+      // Wait a bit for script to load, then init
+      setTimeout(() => {
+        if (window.fbq) {
+          window.fbq("init", pixelId);
+        }
+      }, 100);
     }
 
-    // Track page view on route change
-    const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : "");
-    window.fbq("track", "PageView", {
-      content_name: pathname,
-      content_category: "page_view",
-    });
+    // Track page view when route changes
+    if (window.fbq) {
+      window.fbq("track", "PageView", {
+        content_name: pathname,
+        content_category: "page_view",
+      });
+    }
   }, [pathname, searchParams, pixelId]);
 
   return null;
+}
+
+export function FacebookPixel({ pixelId }: FacebookPixelProps) {
+  return (
+    <Suspense fallback={null}>
+      <FacebookPixelContent pixelId={pixelId} />
+    </Suspense>
+  );
 }

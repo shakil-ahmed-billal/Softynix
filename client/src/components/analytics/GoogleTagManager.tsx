@@ -2,12 +2,6 @@
 
 import Script from "next/script";
 
-declare global {
-  interface Window {
-    dataLayer: any[];
-  }
-}
-
 interface GoogleTagManagerProps {
   containerId: string;
 }

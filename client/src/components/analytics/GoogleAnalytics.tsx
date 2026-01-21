@@ -1,25 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-
-declare global {
-  interface Window {
-    gtag: (
-      command: string,
-      targetId: string | Date,
-      config?: Record<string, any>
-    ) => void;
-    dataLayer: any[];
-  }
-}
 
 interface GoogleAnalyticsProps {
   measurementId: string;
 }
 
-export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
+function GoogleAnalyticsContent({ measurementId }: GoogleAnalyticsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -35,6 +24,10 @@ export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
     });
   }, [pathname, searchParams, measurementId]);
 
+  return null;
+}
+
+export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
   if (!measurementId) {
     return null;
   }
@@ -61,6 +54,9 @@ export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
           `,
         }}
       />
+      <Suspense fallback={null}>
+        <GoogleAnalyticsContent measurementId={measurementId} />
+      </Suspense>
     </>
   );
 }

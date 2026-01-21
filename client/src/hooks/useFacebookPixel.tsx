@@ -2,16 +2,6 @@
 
 import { useCallback } from "react";
 
-declare global {
-  interface Window {
-    fbq: (
-      action: string,
-      event: string,
-      params?: Record<string, any>
-    ) => void;
-  }
-}
-
 /**
  * Hook for tracking Facebook Pixel events
  * Usage:

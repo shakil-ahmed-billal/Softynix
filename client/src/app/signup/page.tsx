@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { useSignup } from "@/hooks/useAuth";
-import { useAuth } from "@/contexts/auth-context";
-import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
+import ClientWrapper from "@/components/shared/ClientWrapper";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/auth-context";
+import { useSignup } from "@/hooks/useAuth";
+import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import toast from "react-hot-toast";
 
 function SignupPageContent() {
@@ -145,7 +146,9 @@ export default function SignupPage() {
         </div>
       }
     >
-      <SignupPageContent />
+      <ClientWrapper>
+        <SignupPageContent />
+      </ClientWrapper>
     </Suspense>
   );
 }

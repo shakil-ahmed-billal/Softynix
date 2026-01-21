@@ -1,17 +1,10 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCart } from "@/contexts/cart-context";
-import { useAuth } from "@/contexts/auth-context";
-import { useCreateOrder } from "@/hooks/useOrderMutations";
-import { useFacebookPixel } from "@/hooks/useFacebookPixel";
-import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
+import ClientWrapper from "@/components/shared/ClientWrapper";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -19,9 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CreditCard, CheckCircle2, ArrowLeft, Wallet, Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/auth-context";
+import { useCart } from "@/contexts/cart-context";
+import { useFacebookPixel } from "@/hooks/useFacebookPixel";
+import { useGoogleAnalytics } from "@/hooks/useGoogleAnalytics";
+import { useCreateOrder } from "@/hooks/useOrderMutations";
+import { ArrowLeft, CheckCircle2, Loader2, Wallet } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import Link from "next/link";
 
 const PAYMENT_METHODS = [
   { value: "Bkash", label: "Bkash" },
@@ -424,7 +424,10 @@ export default function PaymentPage() {
         </div>
       }
     >
+      <ClientWrapper>
       <PaymentPageContent />
+
+      </ClientWrapper>
     </Suspense>
   );
 }

@@ -59,18 +59,18 @@ export function generateMetadata({
       canonical: url,
     },
     openGraph: {
-      type,
+      type: "website",
       locale: "en_US",
-      url,
+      url: new URL(url),
       title: fullTitle,
-      description: description || defaultDescription,
+      description: description ?? defaultDescription,
       siteName,
       images: [
         {
-          url: ogImage,
+          url: new URL(ogImage),
           width: 1200,
           height: 630,
-          alt: title,
+          alt: fullTitle,
         },
       ],
     },
