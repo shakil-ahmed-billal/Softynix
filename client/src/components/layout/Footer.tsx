@@ -100,8 +100,8 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Contact Support</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>123 Main Street, Dhaka</li>
-              <li>support@softynix.com</li>
-              <li>+880 1234 567890</li>
+              <li>softynix.bd@gmail.com</li>
+              <li>+880 1315-608844</li>
             </ul>
           </div>
         </div>
