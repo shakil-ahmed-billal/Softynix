@@ -269,7 +269,7 @@ export default function ShopPage() {
                 })}
                 {searchQuery && (
                   <span className="inline-flex items-center gap-1 bg-accent/10 text-accent px-2 py-1 rounded-lg text-xs font-medium">
-                    "{searchQuery}"
+                    {searchQuery}
                     <button onClick={() => setSearchQuery("")} className="hover:bg-accent/20 rounded">×</button>
                   </span>
                 )}
