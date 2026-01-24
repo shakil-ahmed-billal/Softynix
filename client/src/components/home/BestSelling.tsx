@@ -3,7 +3,7 @@
 import ProductCard from "@/components/shared/ProductCard";
 import { Button } from "@/components/ui/button";
 import { useAllProducts } from "@/hooks/useAllProducts";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -29,14 +29,22 @@ export default function BestSelling() {
 
   if (isLoading) {
     return (
-      <section className="relative">
-        <div className="container mx-auto px-4 py-12">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-semibold">সেরা বিক্রিত প্রোডাক্টসমূহ</h2>
+      <section className="relative py-6 md:py-10">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-6 md:h-8 bg-gradient-primary rounded-full" />
+              <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground">
+                সেরা বিক্রিত প্রোডাক্টসমূহ
+              </h2>
+            </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+              <div 
+                key={i} 
+                className="h-72 md:h-80 bg-card/50 animate-pulse rounded-2xl border border-border/50"
+              />
             ))}
           </div>
         </div>
@@ -45,26 +53,41 @@ export default function BestSelling() {
   }
 
   return (
-    <section className="relative">
-      <div className="container mx-auto px-4 py-12 ">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-semibold">সেরা বিক্রিত প্রোডাক্টসমূহ</h2>
-          <Button variant="ghost" className="gap-2" asChild>
+    <section className="relative py-6 md:py-10">
+      <div className="container mx-auto px-4">
+        {/* Section Header */}
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-1 h-6 md:h-8 bg-gradient-primary rounded-full" />
+            <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground">
+              সেরা বিক্রিত প্রোডাক্টসমূহ
+            </h2>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="text-primary hover:text-primary/80 gap-1 hover:gap-2 transition-all text-xs md:text-sm font-semibold px-2 md:px-3"
+            asChild
+          >
             <Link href="/shop">
               View All
-              <ArrowRight className="h-4 w-4" />
+              <ChevronRight className="h-3.5 w-3.5 md:h-4 md:w-4" />
             </Link>
           </Button>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+
+        {/* Products Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {products.length > 0 ? (
             products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))
           ) : (
-            <p className="col-span-full text-center text-muted-foreground">
-              No products available
-            </p>
+            <div className="col-span-full text-center py-8 md:py-12">
+              <p className="text-sm md:text-base text-muted-foreground">
+                কোনো প্রোডাক্ট পাওয়া যায়নি
+              </p>
+            </div>
           )}
         </div>
       </div>
