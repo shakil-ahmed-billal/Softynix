@@ -14,6 +14,7 @@ export interface Product {
   isNew?: boolean;
   priceValue: number;
   image?: string;
+  reviews?: any;
 }
 
 export interface CartItem extends Product {

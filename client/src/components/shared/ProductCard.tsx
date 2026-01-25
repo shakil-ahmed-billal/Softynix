@@ -60,7 +60,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   // Mock rating - you can replace with actual rating from product data
   const rating = product.rating || 4.8;
-  const reviews = product.reviews || Math.floor(Math.random() * 500) + 50;
+  const reviews = product?.reviews || Math.floor(Math.random() * 500) + 50;
 
   return (
     <Card
