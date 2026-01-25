@@ -2,10 +2,10 @@
 
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { Button } from "@/components/ui/button";
-import { Menu, Sparkles, X } from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 
-// Mobile Bottom Sheet Component
+// Mobile Bottom Sheet Component - 60% height with scrollable background
 function MobileBottomSheet({ 
   isOpen, 
   onClose, 
@@ -17,12 +17,19 @@ function MobileBottomSheet({
 }) {
   useEffect(() => {
     if (isOpen) {
+      // Prevent background scroll but keep it visible
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
     };
   }, [isOpen]);
 
@@ -30,35 +37,63 @@ function MobileBottomSheet({
 
   return (
     <div className="fixed inset-0 z-50 lg:hidden">
-      {/* Backdrop */}
+      {/* Backdrop - 40% visible area (stays scrollable visually) */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
+        className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
         onClick={onClose}
+        style={{
+          animation: 'fadeIn 0.2s ease-out'
+        }}
       />
       
-      {/* Bottom Sheet */}
+      {/* Bottom Sheet - 60% height */}
       <div 
-        className="absolute bottom-0 left-0 right-0 bg-background rounded-t-3xl border-t-4 border-primary/20 shadow-2xl animate-slide-up max-h-[88vh] flex flex-col overflow-hidden"
+        className="absolute bottom-0 left-0 right-0 bg-background rounded-t-[28px] shadow-2xl flex flex-col overflow-hidden border-t-2 border-primary/20"
+        style={{
+          height: '60vh',
+          animation: 'slideUpSheet 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}
       >
         {/* Drag Handle */}
         <div className="flex justify-center pt-3 pb-2 shrink-0 bg-gradient-to-b from-primary/5 to-transparent">
-          <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full" />
+          <div className="w-10 h-1 bg-muted-foreground/40 rounded-full" />
         </div>
         
-        {/* Close Button - Mobile Only */}
-        <div className="absolute top-5 right-5 z-10">
+        {/* Close Button */}
+        <div className="absolute top-4 right-4 z-10">
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm hover:bg-destructive/10 hover:text-destructive transition-all shadow-lg border border-border/50"
+            className="h-9 w-9 rounded-full bg-muted/80 hover:bg-destructive/10 hover:text-destructive transition-all shadow-md"
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
         
-        {children}
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-hidden">
+          {children}
+        </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes slideUpSheet {
+          from { 
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          to { 
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -71,37 +106,36 @@ export default function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Mobile Header with Menu Button */}
-      <div className="lg:hidden sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
-        <div className="container mx-auto px-4 py-3.5">
+    <div className="min-h-screen bg-background">
+      {/* Mobile Header - App-like design */}
+      <div className="lg:hidden sticky top-0 z-40 bg-background/98 backdrop-blur-xl border-b border-border/50 shadow-sm">
+        <div className="p-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-primary shadow-lg glow-primary flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-base font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            {/* Brand */}
+            <div className="flex items-center gap-2.5">
+              
+              <div className="flex flex-col leading-tight">
+                <span className="text-base font-bold text-gradient">
                   Softynix
                 </span>
-                <span className="text-xs text-muted-foreground font-medium">Dashboard</span>
+                <span className="text-[10px] text-muted-foreground font-medium">Dashboard</span>
               </div>
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Menu Button */}
             <Button
               onClick={() => setMobileMenuOpen(true)}
               variant="outline"
               size="icon"
-              className="h-10 w-10 rounded-xl border-border/50 hover:border-primary hover:bg-primary/5 transition-all"
+              className="h-9 w-9 rounded-xl border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-4.5 w-4.5" strokeWidth={2.5} />
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Bottom Sheet */}
+      {/* Mobile Bottom Sheet - 60% height */}
       <MobileBottomSheet 
         isOpen={mobileMenuOpen} 
         onClose={() => setMobileMenuOpen(false)}
@@ -110,19 +144,19 @@ export default function DashboardLayout({
       </MobileBottomSheet>
 
       {/* Main Container */}
-      <div className="container mx-auto px-4 md:px-6 py-4 md:py-0">
-        <div className="flex flex-col lg:flex-row gap-0 lg:gap-6">
-          {/* Desktop Sidebar - Hidden on Mobile */}
+      <div className="lg:container lg:mx-auto lg:px-6 lg:py-0">
+        <div className="flex flex-col lg:flex-row lg:gap-6">
+          {/* Desktop Sidebar */}
           <div className="hidden lg:block">
-            <div className="sticky top-6">
-              <div className="w-72 h-[calc(100vh-48px)] overflow-hidden rounded-2xl border border-border/50 shadow-xl bg-background">
+            <div className="sticky top-0">
+              <div className={` h-[calc(100vh)] overflow-hidden  border border-border/50 shadow-lg bg-background`}>
                 <DashboardSidebar />
               </div>
             </div>
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 py-4 lg:py-6">
+          <div className="flex-1 p-4 lg:p-0 lg:py-6">
             <div className="animate-fade-in">
               {children}
             </div>

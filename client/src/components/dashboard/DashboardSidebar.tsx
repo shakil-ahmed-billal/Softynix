@@ -31,7 +31,6 @@ import {
   User,
   User2,
   Zap,
-  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -106,7 +105,7 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
   const handleMenuItemClick = (title: string) => {
     setActiveItem(title);
     if (onNavigate) {
-      setTimeout(() => onNavigate(), 200);
+      setTimeout(() => onNavigate(), 150);
     }
   };
 
@@ -123,33 +122,33 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
     return (
       <button
         onClick={() => handleMenuItemClick(item.title)}
-        className={`group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${
+        className={`group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 active:scale-[0.98] ${
           isActive
             ? "bg-gradient-primary text-white shadow-md"
-            : "text-foreground hover:bg-muted/60"
-        } ${isCollapsed ? "justify-center w-[60px]" : ""}`}
+            : "text-foreground hover:bg-muted/70 active:bg-muted"
+        } ${isCollapsed ? "justify-center" : ""}`}
       >
         {colorClass && !isActive ? (
-          <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${colorClass} flex items-center justify-center shadow-sm shrink-0`}>
-            <Icon className="h-4 w-4 text-white" />
+          <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${colorClass} flex items-center justify-center shadow-sm shrink-0`}>
+            <Icon className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
           </div>
         ) : (
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-            isActive ? 'bg-white/10' : 'bg-muted/40'
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+            isActive ? 'bg-white/15' : 'bg-muted/60'
           }`}>
-            <Icon className="h-4 w-4" />
+            <Icon className="h-4.5 w-4.5" strokeWidth={2.5} />
           </div>
         )}
         
         {!isCollapsed && (
           <>
-            <span className="flex-1 font-medium text-sm text-left">
+            <span className="flex-1 font-semibold text-[13px] text-left leading-tight">
               {item.title}
             </span>
             {item.badge && (
               <Badge 
                 variant="destructive" 
-                className="h-5 min-w-[20px] px-1.5 text-xs font-semibold shrink-0"
+                className="h-5 min-w-[20px] px-1.5 text-[10px] font-bold shrink-0"
               >
                 {item.badge}
               </Badge>
@@ -157,7 +156,7 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
           </>
         )}
         {isCollapsed && item.badge && (
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full"></div>
+          <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-destructive rounded-full ring-2 ring-background"></div>
         )}
       </button>
     );
@@ -165,48 +164,30 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
 
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Header */}
-      <div className={`border-b border-border/50 ${
-        isCollapsed ? 'px-2 py-3' : 'px-4 py-4'
-      } shrink-0`}>
-        <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <div className="flex items-center gap-2.5">
-              <div className="h-9 w-9 rounded-xl bg-gradient-primary shadow-md flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-foreground">
-                  Softynix
-                </span>
-                <span className="text-xs text-muted-foreground">Dashboard</span>
-              </div>
-            </div>
+      {/* Header - Desktop Only */}
+      <div className={`hidden lg:flex border-b border-border/50 ${
+        isCollapsed ? 'px-2 py-3' : 'px-3 py-3'
+      } shrink-0 items-center justify-end`}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="h-8 w-8 rounded-lg hover:bg-muted transition-all"
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
           )}
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`h-8 w-8 rounded-lg hover:bg-muted transition-all hidden lg:flex ${
-              isCollapsed ? "mx-auto" : ""
-            }`}
-          >
-            {isCollapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
+        </Button>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content - Scrollable */}
       <div className={`flex-1 overflow-y-auto custom-scrollbar ${
-        isCollapsed ? 'px-2 py-3' : 'px-4 py-4'
+        isCollapsed ? 'px-2 py-3' : 'px-3 py-4'
       }`}>
         {/* Dashboard Overview */}
-        <div className="mb-3">
+        <div className="mb-2">
           <Link href="/dashboard/">
             <MenuButton
               item={{
@@ -220,13 +201,13 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
         </div>
 
         {/* Separator */}
-        <div className="h-px bg-border/50 my-3" />
+        <div className="h-px bg-border/40 my-3" />
 
         {/* Main Categories */}
         <div className="mb-3">
           {!isCollapsed && (
             <div className="px-3 mb-2">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 প্রধান ক্যাটাগরি
               </h3>
             </div>
@@ -245,13 +226,13 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
         </div>
 
         {/* Separator */}
-        <div className="h-px bg-border/50 my-3" />
+        <div className="h-px bg-border/40 my-3" />
 
         {/* Account Section */}
         <div>
           {!isCollapsed && (
             <div className="px-3 mb-2">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 অ্যাকাউন্ট
               </h3>
             </div>
@@ -271,12 +252,12 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
 
       {/* Footer */}
       <div className={`border-t border-border/50 ${
-        isCollapsed ? 'px-2 py-3' : 'px-4 py-3'
-      } shrink-0`}>
+        isCollapsed ? 'px-2 py-2.5' : 'px-3 py-3'
+      } shrink-0 bg-muted/20`}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className={`w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-muted/60 transition-all ${
+              className={`w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-muted/70 active:bg-muted active:scale-[0.98] transition-all ${
                 isCollapsed ? "justify-center" : ""
               }`}
             >
@@ -289,10 +270,10 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
               {!isCollapsed && (
                 <>
                   <div className="flex-1 text-left min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">
+                    <p className="text-[13px] font-bold text-foreground truncate leading-tight">
                       John Doe
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">
+                    <p className="text-[10px] text-muted-foreground truncate">
                       john@example.com
                     </p>
                   </div>
@@ -351,9 +332,9 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Quick Settings */}
+        {/* Quick Settings - Desktop Only */}
         {!isCollapsed && (
-          <div className="flex gap-2 pt-2">
+          <div className="hidden lg:flex gap-2 pt-2">
             <Button
               variant="ghost"
               size="icon"
@@ -365,8 +346,9 @@ export default function DashboardSidebar({ onNavigate }: DashboardSidebarProps) 
               variant="ghost"
               size="icon"
               className="h-9 w-full rounded-lg hover:bg-muted transition-all"
+              asChild
             >
-              <Link href={"/dashboard/support"}>
+              <Link href="/dashboard/support">
                 <HelpCircle className="h-4 w-4" />
               </Link>
             </Button>
