@@ -2,9 +2,7 @@ import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { GoogleTagManager } from "@/components/analytics/GoogleTagManager";
 import { CartWrapper } from "@/components/cart/CartWrapper";
 import { FacebookPixel } from "@/components/facebook/FacebookPixel";
-import MobileFooter from "@/components/home/Mobile/layout/MobileFooter";
 import BottomNav from "@/components/layout/BottomNav";
-import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import { AuthProvider } from "@/contexts/auth-context";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
@@ -15,6 +13,7 @@ import "./globals.css";
 import { QueryProvider } from "./providers/query-provider";
 import { ThemeProvider } from "./providers/theme-provider";
 import { ToastProvider } from "./providers/toast-provider";
+import Footer from "@/components/layout/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,7 +26,8 @@ const GTM_CONTAINER_ID = process.env.NEXT_PUBLIC_GTM_CONTAINER_ID || "";
 
 // Home page metadata - optimized for SEO with trending keywords
 export const metadata: Metadata = generateSEOMetadata({
-  title: "Softynix - Digital Product Marketplace | Buy AI Tools, Software & Courses",
+  title:
+    "Softynix - Digital Product Marketplace | Buy AI Tools, Software & Courses",
   description:
     "Buy authentic digital products in Bangladesh. Premium AI subscriptions (ChatGPT, Claude), software licenses, productivity apps, and online courses. Best prices, instant delivery, trusted marketplace.",
   keywords: [
@@ -60,7 +60,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans`} suppressHydrationWarning>
+      <body className="" suppressHydrationWarning>
         {/* Facebook Pixel Base Code */}
         {FACEBOOK_PIXEL_ID && (
           <>
@@ -94,14 +94,18 @@ export default function RootLayout({
           </>
         )}
         {/* Google Tag Manager - Must be first */}
-        {GTM_CONTAINER_ID && <GoogleTagManager containerId={GTM_CONTAINER_ID} />}
-        
+        {GTM_CONTAINER_ID && (
+          <GoogleTagManager containerId={GTM_CONTAINER_ID} />
+        )}
+
         {/* Facebook Pixel */}
         {FACEBOOK_PIXEL_ID && <FacebookPixel pixelId={FACEBOOK_PIXEL_ID} />}
-        
+
         {/* Google Analytics */}
-        {GA_MEASUREMENT_ID && <GoogleAnalytics measurementId={GA_MEASUREMENT_ID} />}
-        
+        {GA_MEASUREMENT_ID && (
+          <GoogleAnalytics measurementId={GA_MEASUREMENT_ID} />
+        )}
+
         <QueryProvider>
           <ThemeProvider
             attribute="class"
@@ -115,17 +119,12 @@ export default function RootLayout({
                 <header>
                   <Header />
                 </header>
-                <div className="flex min-h-screen flex-col">
+
+                <div className="flex min-h-[calc(100vh-128.5px)] flex-col">
                   <main className="flex-1">{children}</main>
+                  <div className="hidden md:block"><Footer /></div>
                 </div>
-                <footer>
-                  <div className="hidden md:block">
-                    <Footer />
-                  </div>
-                  <div className="block md:hidden">
-                    <MobileFooter />
-                  </div>
-                </footer>
+
                 <div className="md:hidden flex">
                   <BottomNav />
                 </div>

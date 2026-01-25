@@ -1,21 +1,19 @@
-"use client";
-
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ShoppingBag } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
 
-export default function OfferBanner() {
+const OfferBanner = () => {
   const [timeLeft, setTimeLeft] = useState({
     hours: 23,
     minutes: 43,
-    seconds: 53,
+    seconds: 5,
   });
 
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         let { hours, minutes, seconds } = prev;
+        
         if (seconds > 0) {
           seconds--;
         } else if (minutes > 0) {
@@ -26,6 +24,7 @@ export default function OfferBanner() {
           minutes = 59;
           seconds = 59;
         }
+        
         return { hours, minutes, seconds };
       });
     }, 1000);
@@ -33,48 +32,49 @@ export default function OfferBanner() {
     return () => clearInterval(timer);
   }, []);
 
+  const TimeBlock = ({ value, label }: { value: number; label: string }) => (
+    <div className="flex flex-col items-center">
+      <div className="bg-secondary/80 rounded-xl w-14 h-14 flex items-center justify-center border border-border/50">
+        <span className="text-xl font-bold text-foreground">
+          {value.toString().padStart(2, "0")}
+        </span>
+      </div>
+      <span className="text-[10px] text-muted-foreground mt-1">{label}</span>
+    </div>
+  );
+
   return (
-    <section className="">
-      <div className="container mx-auto px-4 py-12 ">
-        <Card className="border-purple-500/30 bg-card">
-          <CardContent className="flex flex-col md:flex-row items-center justify-between p-8 gap-6">
-            <div className="flex-1 text-center md:text-left">
-              <h3 className="text-2xl md:text-3xl font-semibold mb-2">
-                বিশেষ ছাড়! সীমিত সময়ের অফার
-              </h3>
-              <p className="text-muted-foreground">
-                আজই কিনুন এবং বিশেষ ছাড় পান
-              </p>
-            </div>
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex gap-2">
-                <div className="bg-background rounded-lg p-3 min-w-[60px] text-center border border-primary/20">
-                  <div className="text-2xl font-bold text-primary">
-                    {String(timeLeft.hours).padStart(2, "0")}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Hours</div>
-                </div>
-                <div className="bg-background rounded-lg p-3 min-w-[60px] text-center border border-primary/20">
-                  <div className="text-2xl font-bold text-primary">
-                    {String(timeLeft.minutes).padStart(2, "0")}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Minutes</div>
-                </div>
-                <div className="bg-background rounded-lg p-3 min-w-[60px] text-center border border-primary/20">
-                  <div className="text-2xl font-bold text-primary">
-                    {String(timeLeft.seconds).padStart(2, "0")}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Seconds</div>
-                </div>
-              </div>
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
-                <ShoppingBag className="mr-2 h-5 w-5" />
-                এখনই কিনুন
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+    <section className="container mx-auto px-4 py-6 md:py-10">
+      <div className="bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-2xl p-5 border border-primary/20 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/10 rounded-full blur-2xl" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-5 h-5 text-accent" />
+            <span className="text-sm font-medium text-accent">বিশেষ ছাড়!</span>
+          </div>
+          
+          <h3 className="text-lg font-bold text-foreground mb-4">
+            সীমিত সময়ের অফার
+          </h3>
+          
+          <div className="flex items-center justify-center gap-3 mb-5">
+            <TimeBlock value={timeLeft.hours} label="Hours" />
+            <span className="text-xl font-bold text-primary mt-[-20px]">:</span>
+            <TimeBlock value={timeLeft.minutes} label="Minutes" />
+            <span className="text-xl font-bold text-primary mt-[-20px]">:</span>
+            <TimeBlock value={timeLeft.seconds} label="Seconds" />
+          </div>
+          
+          <Button className="w-full" size="lg">
+            এখনই কিনুন
+          </Button>
+        </div>
       </div>
     </section>
   );
-}
+};
+
+export default OfferBanner;

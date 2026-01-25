@@ -75,7 +75,14 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     min-height: 100vh;
     overflow-x: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
+}
+
+
+body::-webkit-scrollbar {
+  display: none;
 }
 
 @layer utilities {
@@ -225,4 +232,8 @@
   .card-shine:hover::before {
     left: 100%;
   }
+}
+
+.lucide.lucide-x.h-4.w-4 {
+	display: none;
 }

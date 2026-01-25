@@ -1,0 +1,54 @@
+2026-01-24 11:03:19.470 +06 [37093] LOG:  starting PostgreSQL 18.1 (Homebrew petere/postgresql) on aarch64-apple-darwin25.1.0, compiled by Apple clang version 17.0.0 (clang-1700.4.4.1), 64-bit
+2026-01-24 11:03:19.471 +06 [37093] LOG:  listening on IPv6 address "::1", port 5432
+2026-01-24 11:03:19.471 +06 [37093] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2026-01-24 11:03:19.471 +06 [37093] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2026-01-24 11:03:19.482 +06 [37099] LOG:  database system was shut down at 2026-01-24 09:43:28 +06
+2026-01-24 11:03:19.487 +06 [37093] LOG:  database system is ready to accept connections
+2026-01-24 11:03:54.900 +06 [37602] FATAL:  database "shakilahmedbillal" does not exist
+2026-01-24 11:07:49.095 +06 [40731] ERROR:  insert or update on table "order_items" violates foreign key constraint "order_items_orderId_fkey"
+2026-01-24 11:07:49.095 +06 [40731] DETAIL:  Key (orderId)=(740f5bb3-123a-45a2-8778-0ddda2efc4fb) is not present in table "orders".
+2026-01-24 11:07:49.095 +06 [40731] STATEMENT:  insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-28 21:23:11.877', 'ed14eb37-c333-4f17-9d75-2b849dd89ade', '740f5bb3-123a-45a2-8778-0ddda2efc4fb', '1100.00', 'p1a1e1f1-1001-4b01-9001-aaaaaaaaaaaa', 1, '1100.00');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-28 21:30:34.236', 'cd2fad98-0d43-40a5-8ba7-a36cae75de8a', '52ab1a2a-8a88-4d97-90e9-962943060445', '1100.00', 'p1a1e1f1-1001-4b01-9001-aaaaaaaaaaaa', 1, '1100.00');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-28 23:24:47.117', 'fd8da4f4-087f-4012-92eb-a9ec73a64552', '9708d86c-0d55-4e34-ac07-bd131f961fba', '0.00', '7e9acc2b-9467-4a36-8f9c-652c47f196c5', 1, '0.00');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-29 00:04:04.272', 'a9d0fbf6-beb2-4634-9bee-74a151c9d052', '4873e85f-75af-4dc1-8ccc-6d6b55e468bb', '99.99', 'cafde626-6101-49aa-a830-40c23aefefa1', 1, '99.99');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-29 00:14:34.747', '3f080d43-82a4-44a4-996e-6edabf8c2512', '02b94f49-2407-438b-a281-21f6b1aa5e8c', '1000.00', 'p1a1e1f1-1003-4b01-9001-cccccccccccc', 1, '1000.00');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-29 00:14:34.747', '2cb229e4-2b03-4b7c-929a-5a506e7a3d42', '02b94f49-2407-438b-a281-21f6b1aa5e8c', '200.00', 'p1a1e1f1-1002-4b01-9001-bbbbbbbbbbbb', 1, '200.00');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-29 00:14:34.747', '42b18344-ebc5-4f02-8c53-5c251229f107', '02b94f49-2407-438b-a281-21f6b1aa5e8c', '199.99', '6f1b8bb3-6737-464f-9cd1-4e488424d9df', 1, '199.99');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-29 00:14:34.747', 'a77efb9b-8bc0-4f09-af05-7454fd37fb61', '02b94f49-2407-438b-a281-21f6b1aa5e8c', '3.00', 'a754c4b0-043f-43df-aee0-40675d037b47', 1, '3.00');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-29 06:14:51.066', '503bf8af-664b-47b2-a99b-e5a79b4acba8', 'db529257-c537-48f5-bba9-7797a59035f7', '15.00', 'p1a1e1f1-1004-4b01-9001-dddddddddddd', 1, '15.00');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-29 06:50:33.578', 'c39fd13a-28eb-4f3f-b109-70937ccd992e', '361c0955-dd3e-4395-8636-fc7e9dc5cd51', '9.99', '230ae86e-7875-4175-8ed5-0497a9d6b91a', 1, '9.99');
+	insert into "order_items" ("createdAt", "id", "orderId", "price", "productId", "quantity", "subtotal") values ('2025-12-29 06:56:45.113', 'bf2ec2fc-44b5-4e84-a1d4-97ff1afbbfdd', 'c251af70-ca84-423b-b159-222aa993084b', '13.99', '923aee08-c2a9-4aee-83bd-c2202eca23cf', 1, '13.99');
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+2026-01-24 11:08:19.482 +06 [37097] LOG:  checkpoint starting: time
+2026-01-24 11:08:26.100 +06 [37097] LOG:  checkpoint complete: wrote 65 buffers (0.4%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=6.608 s, sync=0.005 s, total=6.618 s; sync files=38, longest=0.001 s, average=0.001 s; distance=44 kB, estimate=44 kB; lsn=0/1453AD90, redo lsn=0/1453AD38
+2026-01-24 11:09:27.557 +06 [41408] ERROR:  insert or update on table "course_lesson_completions" violates foreign key constraint "course_lesson_completions_userProductAccessId_fkey"
+2026-01-24 11:09:27.557 +06 [41408] DETAIL:  Key (userProductAccessId)=(d22f7f87-da04-4119-8671-3f4625c54c01) is not present in table "user_product_access".
+2026-01-24 11:09:27.557 +06 [41408] STATEMENT:  insert into "course_lesson_completions" ("completed", "completedAt", "courseId", "createdAt", "id", "milestoneId", "moduleId", "updatedAt", "userProductAccessId", "viewed", "viewedAt") values (true, '2026-01-21 03:27:27.862', '1056659e-343b-4d9a-aadc-ef19d3aec062', '2025-12-29 03:28:25.886', '4a83912a-f67a-4a9c-9c8d-2ad647d346fe', 1, 1, '2026-01-21 03:27:27.871', 'd22f7f87-da04-4119-8671-3f4625c54c01', true, '2026-01-21 03:27:27.862');
+	insert into "course_lesson_completions" ("completed", "completedAt", "courseId", "createdAt", "id", "milestoneId", "moduleId", "updatedAt", "userProductAccessId", "viewed", "viewedAt") values (false, NULL, '1056659e-343b-4d9a-aadc-ef19d3aec062', '2026-01-21 03:27:32.424', 'ff5d8c83-2a45-4c4d-8691-d15e15670158', 1, 2, '2026-01-21 03:27:32.424', 'd22f7f87-da04-4119-8671-3f4625c54c01', true, '2026-01-21 03:27:32.422');
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+2026-01-24 11:13:19.102 +06 [37097] LOG:  checkpoint starting: time
+2026-01-24 11:13:25.608 +06 [37097] LOG:  checkpoint complete: wrote 64 buffers (0.4%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=6.499 s, sync=0.004 s, total=6.506 s; sync files=38, longest=0.001 s, average=0.001 s; distance=39 kB, estimate=44 kB; lsn=0/14544D50, redo lsn=0/14544CC0
+2026-01-24 11:38:19.613 +06 [37097] LOG:  checkpoint starting: time
+2026-01-24 11:38:19.723 +06 [37097] LOG:  checkpoint complete: wrote 1 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.103 s, sync=0.001 s, total=0.112 s; sync files=1, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=39 kB; lsn=0/14544F50, redo lsn=0/14544EF8
+2026-01-24 12:03:19.730 +06 [37097] LOG:  checkpoint starting: time
+2026-01-24 12:03:20.457 +06 [37097] LOG:  checkpoint complete: wrote 7 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.718 s, sync=0.001 s, total=0.727 s; sync files=8, longest=0.001 s, average=0.001 s; distance=12 kB, estimate=36 kB; lsn=0/145481D8, redo lsn=0/14548180
+2026-01-24 12:13:19.459 +06 [37097] LOG:  checkpoint starting: time
+2026-01-24 12:13:19.671 +06 [37097] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.206 s, sync=0.001 s, total=0.213 s; sync files=3, longest=0.001 s, average=0.001 s; distance=5 kB, estimate=33 kB; lsn=0/14549738, redo lsn=0/145496E0

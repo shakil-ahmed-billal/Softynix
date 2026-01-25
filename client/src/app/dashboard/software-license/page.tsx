@@ -51,9 +51,7 @@ export default function SoftwareLicensePage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">সফটওয়্যার লাইসেন্স</h1>
-          <p className="text-muted-foreground">
-            Manage your software licenses and activation keys
-          </p>
+          <p className="text-muted-foreground">Manage your AI tool subscriptions and access credentials</p>
         </div>
         <EmptyState
           title="No Software Licenses Yet"
