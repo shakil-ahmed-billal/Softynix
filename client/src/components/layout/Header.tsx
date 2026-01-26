@@ -38,10 +38,12 @@ import {
   X,
 } from "lucide-react";
 import { UseThemeProps, useTheme } from "next-themes";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import lightLogo from "../../../public/logo/light-softynix-logo.png";
 import { ModeToggle } from "../theme/ModeToggle";
 
 export default function Header() {
@@ -131,9 +133,9 @@ export default function Header() {
 
       {/* Main Header */}
       <header
-        className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        className={`top-0 z-50 w-full transition-all duration-300 ${
           isScrolled
-            ? "bg-background/98 backdrop-blur-xl shadow-lg border-b border-primary/20"
+            ? "bg-background/98 backdrop-blur-xl shadow-lg border-b border-primary/20 fixed"
             : "bg-background border-b border-border/50"
         }`}
       >
@@ -330,8 +332,9 @@ export default function Header() {
               href="/"
               className="flex items-center gap-3 flex-shrink-0 group"
             >
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-md glow-primary group-hover:shadow-lg transition-all">
-                <Sparkles className="h-5 w-5 text-white" strokeWidth={2.5} />
+              <div className="relative w-10 h-10  transition-all">
+                {/* <Sparkles className="h-5 w-5 text-white" strokeWidth={2.5} /> */}
+                <Image src={lightLogo} alt="Brand logo" fill />
               </div>
               <div className="flex flex-col leading-tight">
                 <span className="font-bold text-lg text-gradient">
@@ -366,14 +369,16 @@ export default function Header() {
                   return (
                     <NavigationMenuItem key={item.name}>
                       <NavigationMenuLink
-                        href={item.href}
+                        asChild
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-foreground hover:bg-primary/10 hover:text-primary transition-all group"
                       >
-                        <Icon
-                          className="h-4 w-4 group-hover:scale-110 transition-transform"
-                          strokeWidth={2.5}
-                        />
-                        {item.name}
+                        <Link href={item.href}>
+                          <Icon
+                            className="h-4 w-4 group-hover:scale-110 transition-transform"
+                            strokeWidth={2.5}
+                          />
+                          {item.name}
+                        </Link>
                       </NavigationMenuLink>
                     </NavigationMenuItem>
                   );

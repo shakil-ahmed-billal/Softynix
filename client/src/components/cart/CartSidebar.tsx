@@ -98,7 +98,7 @@ export function CartSidebar() {
         {/* Content Area */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {cartItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 px-6 text-center flex-1">
+            <div className="flex flex-col items-center justify-center  px-6 text-center flex-1">
               <div className="relative mb-6">
                 <div className="absolute inset-0 bg-primary/10 blur-2xl rounded-full" />
                 <div className="relative bg-gradient-card p-6 rounded-2xl border border-border/50">
@@ -125,7 +125,7 @@ export function CartSidebar() {
           ) : (
             <>
               {/* Cart Items by Category */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-4">
+              <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-0">
                 <div className="space-y-6 pb-4">
                   {Object.entries(groupedItems).map(([categoryName, items], idx) => (
                     <div 

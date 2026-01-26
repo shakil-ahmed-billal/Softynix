@@ -155,7 +155,7 @@ export default function ShopPage() {
       
 
       {/* Main Shop Content */}
-      <div className="container mx-auto px-3 md:px-4 -mt-2">
+      <div className="container mx-auto px-3 md:px-4 ">
         <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
           {/* Filter Sidebar - Desktop */}
           <div className="hidden lg:block sticky top-4 h-fit">

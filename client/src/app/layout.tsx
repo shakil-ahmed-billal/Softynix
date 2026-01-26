@@ -14,6 +14,7 @@ import { QueryProvider } from "./providers/query-provider";
 import { ThemeProvider } from "./providers/theme-provider";
 import { ToastProvider } from "./providers/toast-provider";
 import Footer from "@/components/layout/Footer";
+import MobileFooter from "@/components/home/Mobile/layout/MobileFooter";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -119,12 +120,13 @@ export default function RootLayout({
                 <header>
                   <Header />
                 </header>
-
-                <div className="flex min-h-[calc(100vh-128.5px)] flex-col">
-                  <main className="flex-1">{children}</main>
-                  <div className="hidden md:block"><Footer /></div>
-                </div>
-
+                <main className="min-h-[calc(100vh-136.5px)]">
+                  <div className="">{children}</div>
+                  <div className="">
+                    <div className="hidden md:block"><Footer /></div>
+                  <div className="md:hidden"><MobileFooter/></div>
+                  </div>
+                </main>
                 <div className="md:hidden flex">
                   <BottomNav />
                 </div>

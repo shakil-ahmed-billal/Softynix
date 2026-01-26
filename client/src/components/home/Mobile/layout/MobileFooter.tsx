@@ -66,7 +66,7 @@ const MobileFooter = () => {
       <img src="/payment.webp" alt="payment" className="w-full h-full object-cover" />
 
       {/* Copyright */}
-      <p className="text-xs text-muted-foreground text-center pt-6">
+      <p className="text-xs text-muted-foreground text-center pt-6 pb-10">
         © 2023 Softynix. All rights reserved.
       </p>
     </footer>
